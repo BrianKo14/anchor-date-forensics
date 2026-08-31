@@ -1,0 +1,93 @@
+# --- Project-specific ---
+AI-GenBench/
+
+# --- AI ---
+CLAUDE.md
+
+
+
+
+
+# --- OS ---
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Thumbs.db
+desktop.ini
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+dist/
+*.egg-info/
+.eggs/
+.installed.cfg
+*.egg
+
+# --- Virtual environments ---
+.venv/
+venv/
+env/
+ENV/
+
+# --- Jupyter / IPython ---
+.ipynb_checkpoints/
+*/.ipynb_checkpoints/*
+profile_default/
+ipython_config.py
+
+# --- Testing / coverage / caches ---
+.cache/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.ipynb_checkpoints
+htmlcov/
+.coverage
+.coverage.*
+.tox/
+
+# --- Tooling ---
+.python-version
+pip-log.txt
+pip-delete-this-directory.txt
+
+# --- Data / large files (kept in Drive, not git) ---
+data/
+datasets/
+*.tif
+*.tiff
+*.zip
+*.tar
+*.tar.gz
+*.h5
+*.hdf5
+*.npy
+*.npz
+*.parquet
+*.pt
+*.pth
+*.ckpt
+*.safetensors
+
+# --- Secrets / credentials ---
+.env
+.env.*
+*.pem
+*.key
+credentials.json
+service_account.json
+token.json
+
+# --- Editors / IDEs ---
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
