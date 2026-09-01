@@ -6,6 +6,7 @@ that enforce that live here so neither importer can drift from the other.
 
 import json
 import os
+import random
 from pathlib import Path
 
 # parents[2] rather than Path.cwd(): the importers are scripts, and they should behave the same
@@ -20,7 +21,13 @@ DATA_DIR = PROJECT_ROOT / "data"
 AUTHENTIC_DIR = DATA_DIR / "authentic"
 FAKES_DIR = DATA_DIR / "fakes"
 
-SPLIT = "validation"  # "validation" (36k ids) or "train" (144k); only the id list differs
+BENCHMARK_SPLIT = "validation"  # "validation" (36k ids) or "train" (144k); only the id list differs
+
+# The train/val partition *within* the sample -- a different axis from BENCHMARK_SPLIT above, and
+# recorded per row in the manifests' `split` column.
+TRAIN_SPLIT = "train"
+VAL_SPLIT = "val"
+SPLIT_SEED = 1234
 
 # AI-GenBench constants, from dataset_creation/dataset_utils/common_utils.py
 IMAGE_MIN_SIZE = 200
@@ -39,7 +46,43 @@ MANIFEST_COLUMNS = [
     "width",
     "height",
     "path",
+    "split",
 ]
+
+
+def assign_splits(rows, stratum_of, seed=SPLIT_SEED):
+    """Partition rows 50/50 into TRAIN_SPLIT / VAL_SPLIT, stratified. Sets row["split"] in place.
+
+    `stratum_of` names the group a row must be balanced within: the generator for the fake half, the
+    origin dataset for the real one. Stratifying by generator is the point of the whole exercise --
+    a per-family score model cannot be calibrated on a family that landed entirely on one side.
+
+    Each stratum is seeded from its own name rather than from one global RNG, so gaining or losing a
+    stratum leaves every other one's assignment untouched -- the same stability that lets the
+    importers grow the sample without reshuffling what is already on disk.
+    """
+    by_stratum = {}
+    for row in rows:
+        by_stratum.setdefault(stratum_of(row), []).append(row)
+
+    # Odd strata alternate which side gets the spare image, so the halves stay balanced overall.
+    # Sizes are even at the target counts, but LAION link rot can leave a source short.
+    odd_to_train = True
+
+    for stratum in sorted(by_stratum):
+        members = sorted(by_stratum[stratum], key=lambda row: row["file_id"])
+        random.Random(f"{seed}:{stratum}").shuffle(members)
+
+        n_train = len(members) // 2
+        if len(members) % 2 and odd_to_train:
+            n_train += 1
+        if len(members) % 2:
+            odd_to_train = not odd_to_train
+
+        for position, row in enumerate(members):
+            row["split"] = TRAIN_SPLIT if position < n_train else VAL_SPLIT
+
+    return rows
 
 
 def image_path(out_dir, file_id):
@@ -70,17 +113,20 @@ def read_manifest(out_dir, stem):
 
 def sample_exists():
     """True when both halves have been imported."""
-    return (AUTHENTIC_DIR / f"authentic_{SPLIT}.parquet").exists() and (
-        FAKES_DIR / f"fakes_{SPLIT}.parquet"
+    return (AUTHENTIC_DIR / f"authentic_{BENCHMARK_SPLIT}.parquet").exists() and (
+        FAKES_DIR / f"fakes_{BENCHMARK_SPLIT}.parquet"
     ).exists()
 
 
 def load_sample():
-    """Both halves as one DataFrame, authentic (label 0) first."""
+    """Both halves as one DataFrame, authentic (label 0) first.
+
+    Carries the `split` column the importers wrote, i.e. the train/val partition.
+    """
     import pandas as pd
 
-    authentic = read_manifest(AUTHENTIC_DIR, f"authentic_{SPLIT}")
-    fakes = read_manifest(FAKES_DIR, f"fakes_{SPLIT}")
+    authentic = read_manifest(AUTHENTIC_DIR, f"authentic_{BENCHMARK_SPLIT}")
+    fakes = read_manifest(FAKES_DIR, f"fakes_{BENCHMARK_SPLIT}")
     return pd.concat([authentic, fakes], ignore_index=True)
 
 

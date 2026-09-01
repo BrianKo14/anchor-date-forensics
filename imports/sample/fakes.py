@@ -1,6 +1,6 @@
 """Import the synthetic (fake) half of the sample -> data/fakes.
 
-Two images from each of the 36 benchmark generators, drawn from AI-GenBench's published fake part.
+Four images from each of the 36 benchmark generators, drawn from AI-GenBench's published fake part.
 
 Getting at the original bytes is the whole difficulty. The validation split is ~7 GB across 15
 shards, so streaming pulls far too much; and datasets-server's cached-assets endpoint, which is
@@ -24,10 +24,11 @@ from PIL import Image
 import aigenbench
 from common import (
     AUTHENTIC_DIR,
+    BENCHMARK_SPLIT,
     FAKE_LABEL,
     FAKES_DIR,
     PROJECT_ROOT,
-    SPLIT,
+    assign_splits,
     disk_mb,
     image_path,
     read_manifest,
@@ -38,8 +39,9 @@ from imaging import check_parity, prepare_image
 REPO = "lrzpellegrini/AI-GenBench-fake_part"
 SHARD = "validation-00000-of-00015.parquet"  # any one shard holds all 36 generators
 
-N_PER_GENERATOR = 2  # 2 x 36 generators = 72, matching the authentic half
+N_PER_GENERATOR = 4  # 4 x 36 generators = 144, matching the authentic half
 MAX_ROW_GROUPS = 8   # guard: each row group is ~17 MB, so cap the worst case at ~136 MB
+                     # (4 per generator takes 5 groups, ~86 MB -- the cap has headroom)
 
 INDEX_COLUMNS = ["generator", "file_id", "width", "height", "origin_dataset", "description"]
 
@@ -135,8 +137,8 @@ def main():
     # A cached image has already been normalized, so its original container is no longer readable
     # off disk. Carry the recorded value forward rather than dropping the column to nulls.
     known_formats = {}
-    if (FAKES_DIR / f"fakes_{SPLIT}.parquet").exists():
-        previous = read_manifest(FAKES_DIR, f"fakes_{SPLIT}")
+    if (FAKES_DIR / f"fakes_{BENCHMARK_SPLIT}.parquet").exists():
+        previous = read_manifest(FAKES_DIR, f"fakes_{BENCHMARK_SPLIT}")
         known_formats = dict(zip(previous["file_id"], previous["source_format"]))
 
     rows, source_formats = [], Counter()
@@ -166,12 +168,16 @@ def main():
     for row in rows:
         row["release_date"] = generators[row["generator"]]
 
-    manifest = write_manifest(rows, FAKES_DIR, f"fakes_{SPLIT}")
+    # Stratify by generator: every generator has to reach both sides of the train/val partition.
+    assign_splits(rows, lambda row: row["generator"])
+
+    manifest = write_manifest(rows, FAKES_DIR, f"fakes_{BENCHMARK_SPLIT}")
     print(f"\n{len(manifest)} fake images, {disk_mb(FAKES_DIR):.1f} MB on disk")
     per_generator = manifest["generator"].value_counts()
     print(f"{len(per_generator)} generators, {per_generator.min()}-{per_generator.max()} each")
     print("source containers:",
           ", ".join(f"{fmt} {n}" for fmt, n in source_formats.most_common()))
+    print("splits:", manifest["split"].value_counts().to_dict())
 
     print()
     check_parity(AUTHENTIC_DIR, FAKES_DIR)

@@ -18,17 +18,18 @@ from PIL import Image
 import aigenbench
 from common import (
     AUTHENTIC_DIR,
+    BENCHMARK_SPLIT,
     PROJECT_ROOT,
     REAL_LABEL,
-    SPLIT,
+    assign_splits,
     disk_mb,
     image_path,
     write_manifest,
 )
 from imaging import decode_and_validate, prepare_image
 
-N_PER_SOURCE = 34  # 34 COCO + 34 LAION + N_RAISE = 72, matching the fake half
-N_RAISE = 4        # RAISE TIFFs are ~20 MB each, so sample far fewer
+N_PER_SOURCE = 68  # 68 COCO + 68 LAION + N_RAISE = 144, matching the fake half
+N_RAISE = 8        # RAISE TIFFs are ~20 MB each, so sample far fewer
 SEED = 1234
 
 COCO_DIRS = {"COCO2017_train": "train2017", "COCO2017_val": "val2017"}
@@ -135,8 +136,8 @@ def harvest_coco(file_ids, rng):
 
 
 def harvest_laion(rng):
-    entries = aigenbench.laion_filelist(SPLIT)
-    print(f"{len(entries):,} LAION URLs in the {SPLIT} filelist")
+    entries = aigenbench.laion_filelist(BENCHMARK_SPLIT)
+    print(f"{len(entries):,} LAION URLs in the {BENCHMARK_SPLIT} filelist")
     # The filelist already includes spare images beyond the ids used, precisely to absorb rot.
     rng.shuffle(entries)
     return harvest(
@@ -162,7 +163,7 @@ def harvest_raise(file_ids, rng):
     catalog = pd.read_csv(RAISE_CSV)
     matched = [(wanted[row.File], row.TIFF) for row in catalog.itertuples() if row.File in wanted]
     rng.shuffle(matched)
-    print(f"{len(matched)} of {len(wanted)} {SPLIT}-split RAISE ids found in the CSV")
+    print(f"{len(matched)} of {len(wanted)} {BENCHMARK_SPLIT}-split RAISE ids found in the CSV")
 
     return harvest(candidates=matched, n=N_RAISE, origin="RAISE", url_of=lambda url: url)
 
@@ -171,15 +172,19 @@ def main():
     (AUTHENTIC_DIR / "images").mkdir(parents=True, exist_ok=True)
     rng = random.Random(SEED)
 
-    file_ids = aigenbench.real_file_ids(SPLIT)
+    file_ids = aigenbench.real_file_ids(BENCHMARK_SPLIT)
 
     rows = harvest_coco(file_ids, rng)
     rows += harvest_laion(rng)
     rows += harvest_raise(file_ids, rng)
 
-    manifest = write_manifest(rows, AUTHENTIC_DIR, f"authentic_{SPLIT}")
+    # Stratify by source: the three sources keep their proportions on both sides of the partition.
+    assign_splits(rows, lambda row: row["origin_dataset"])
+
+    manifest = write_manifest(rows, AUTHENTIC_DIR, f"authentic_{BENCHMARK_SPLIT}")
     print(f"\n{len(manifest)} authentic images, {disk_mb(AUTHENTIC_DIR):.1f} MB on disk")
     print(manifest["origin_dataset"].value_counts().to_string())
+    print("splits:", manifest["split"].value_counts().to_dict())
     return manifest
 
 

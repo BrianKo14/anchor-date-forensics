@@ -20,8 +20,18 @@ committed versions have them removed.
 
 ## The sample
 
-A miniature of AI-GenBench: **72 authentic + 72 fake** images, exactly 50/50, with 2 images from
+A miniature of AI-GenBench: **144 authentic + 144 fake** images, exactly 50/50, with 4 images from
 each of the 36 benchmark generators. It lands in `data/` (gitignored).
+
+It is partitioned into a **train** and a **val** half, 72 + 72 each way, recorded per row in the
+manifests' `split` column. The partition is stratified — every generator contributes 2 images to
+each side, and the three authentic sources keep their proportions — because a per-family score model
+cannot be calibrated on a family that landed entirely on one side. Both halves go through the same
+`common.assign_splits`, seeded per stratum so that growing the sample leaves existing assignments
+untouched.
+
+Note that `split` (train/val) and the AI-GenBench split the ids are drawn from (`validation`, in the
+manifest filenames) are different axes; in code the latter is `common.BENCHMARK_SPLIT`.
 
 Importing:
 
@@ -48,8 +58,9 @@ Then explore it with `sample.ipynb`, with the repo root as the working directory
 - **Normalized to JPEG q95**, i.e. the benchmark's `make_jpeg_dataset = True` variant. The shipped
   default is `False`, which leaves fakes as native PNG/JPEG/WEBP against near-all-JPEG reals — a
   format difference that separates the classes on its own.
-- **Small and narrow**: 72 + 72, `validation` split only, drawn from one of 15 shards.
-- **Not byte-reproducible**: LAION link rot means a rerun picks different images.
+- **Small and narrow**: 144 + 144, `validation` split only, drawn from one of 15 shards.
+- **Not byte-reproducible**: LAION link rot means a rerun picks different images. The importer
+  oversamples a shuffled filelist to reach its 68 LAION images, so how many URLs it walks varies.
 - **No ImageNet**, though the AI-GenBench README lists it — its shipped file-id lists contain none.
 - **RAISE needs `RAISE_urls.csv`** fetched by hand from
   [loki.disi.unitn.it/RAISE](http://loki.disi.unitn.it/RAISE/confirm.php?package=all); the step is
@@ -60,7 +71,7 @@ Then explore it with `sample.ipynb`, with the repo root as the working directory
 
 ```
 imports/sample/     one-time importers
-  common.py        paths, constants, manifest I/O
+  common.py        paths, constants, manifest I/O, train/val assignment
   aigenbench.py    the benchmark repo: file-id lists, LAION filelist, generator registry
   imaging.py       decoding and JPEG normalization -- one prepare_image, used by both halves
   authentic.py     entry point for the real half
