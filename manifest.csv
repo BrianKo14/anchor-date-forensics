@@ -1,0 +1,289 @@
+image_id,path,label,generator_family,release_date,generator,crop_path
+COCO2017_train/13992,data/authentic/images/COCO2017_train_13992.jpg,0,authentic,,,data/preprocessed/crop200_align16/COCO2017_train_13992.png
+COCO2017_train/571920,data/authentic/images/COCO2017_train_571920.jpg,0,authentic,,,data/preprocessed/crop200_align16/COCO2017_train_571920.png
+COCO2017_train/539678,data/authentic/images/COCO2017_train_539678.jpg,0,authentic,,,data/preprocessed/crop200_align16/COCO2017_train_539678.png
+COCO2017_train/185915,data/authentic/images/COCO2017_train_185915.jpg,0,authentic,,,data/preprocessed/crop200_align16/COCO2017_train_185915.png
+COCO2017_train/398869,data/authentic/images/COCO2017_train_398869.jpg,0,authentic,,,data/preprocessed/crop200_align16/COCO2017_train_398869.png
+COCO2017_train/498587,data/authentic/images/COCO2017_train_498587.jpg,0,authentic,,,data/preprocessed/crop200_align16/COCO2017_train_498587.png
+COCO2017_train/278938,data/authentic/images/COCO2017_train_278938.jpg,0,authentic,,,data/preprocessed/crop200_align16/COCO2017_train_278938.png
+COCO2017_train/461517,data/authentic/images/COCO2017_train_461517.jpg,0,authentic,,,data/preprocessed/crop200_align16/COCO2017_train_461517.png
+COCO2017_train/262399,data/authentic/images/COCO2017_train_262399.jpg,0,authentic,,,data/preprocessed/crop200_align16/COCO2017_train_262399.png
+COCO2017_train/337416,data/authentic/images/COCO2017_train_337416.jpg,0,authentic,,,data/preprocessed/crop200_align16/COCO2017_train_337416.png
+COCO2017_train/560598,data/authentic/images/COCO2017_train_560598.jpg,0,authentic,,,data/preprocessed/crop200_align16/COCO2017_train_560598.png
+COCO2017_train/180505,data/authentic/images/COCO2017_train_180505.jpg,0,authentic,,,data/preprocessed/crop200_align16/COCO2017_train_180505.png
+COCO2017_train/353938,data/authentic/images/COCO2017_train_353938.jpg,0,authentic,,,data/preprocessed/crop200_align16/COCO2017_train_353938.png
+COCO2017_train/223930,data/authentic/images/COCO2017_train_223930.jpg,0,authentic,,,data/preprocessed/crop200_align16/COCO2017_train_223930.png
+COCO2017_train/295106,data/authentic/images/COCO2017_train_295106.jpg,0,authentic,,,data/preprocessed/crop200_align16/COCO2017_train_295106.png
+COCO2017_train/522160,data/authentic/images/COCO2017_train_522160.jpg,0,authentic,,,data/preprocessed/crop200_align16/COCO2017_train_522160.png
+COCO2017_train/291182,data/authentic/images/COCO2017_train_291182.jpg,0,authentic,,,data/preprocessed/crop200_align16/COCO2017_train_291182.png
+COCO2017_train/400124,data/authentic/images/COCO2017_train_400124.jpg,0,authentic,,,data/preprocessed/crop200_align16/COCO2017_train_400124.png
+COCO2017_train/154090,data/authentic/images/COCO2017_train_154090.jpg,0,authentic,,,data/preprocessed/crop200_align16/COCO2017_train_154090.png
+COCO2017_train/307034,data/authentic/images/COCO2017_train_307034.jpg,0,authentic,,,data/preprocessed/crop200_align16/COCO2017_train_307034.png
+COCO2017_train/61602,data/authentic/images/COCO2017_train_61602.jpg,0,authentic,,,data/preprocessed/crop200_align16/COCO2017_train_61602.png
+COCO2017_train/523274,data/authentic/images/COCO2017_train_523274.jpg,0,authentic,,,data/preprocessed/crop200_align16/COCO2017_train_523274.png
+COCO2017_train/446473,data/authentic/images/COCO2017_train_446473.jpg,0,authentic,,,data/preprocessed/crop200_align16/COCO2017_train_446473.png
+COCO2017_train/77429,data/authentic/images/COCO2017_train_77429.jpg,0,authentic,,,data/preprocessed/crop200_align16/COCO2017_train_77429.png
+COCO2017_train/15260,data/authentic/images/COCO2017_train_15260.jpg,0,authentic,,,data/preprocessed/crop200_align16/COCO2017_train_15260.png
+COCO2017_train/330611,data/authentic/images/COCO2017_train_330611.jpg,0,authentic,,,data/preprocessed/crop200_align16/COCO2017_train_330611.png
+COCO2017_train/94092,data/authentic/images/COCO2017_train_94092.jpg,0,authentic,,,data/preprocessed/crop200_align16/COCO2017_train_94092.png
+COCO2017_val/263594,data/authentic/images/COCO2017_val_263594.jpg,0,authentic,,,data/preprocessed/crop200_align16/COCO2017_val_263594.png
+COCO2017_train/555357,data/authentic/images/COCO2017_train_555357.jpg,0,authentic,,,data/preprocessed/crop200_align16/COCO2017_train_555357.png
+COCO2017_train/238562,data/authentic/images/COCO2017_train_238562.jpg,0,authentic,,,data/preprocessed/crop200_align16/COCO2017_train_238562.png
+COCO2017_train/487098,data/authentic/images/COCO2017_train_487098.jpg,0,authentic,,,data/preprocessed/crop200_align16/COCO2017_train_487098.png
+COCO2017_train/164485,data/authentic/images/COCO2017_train_164485.jpg,0,authentic,,,data/preprocessed/crop200_align16/COCO2017_train_164485.png
+COCO2017_train/456670,data/authentic/images/COCO2017_train_456670.jpg,0,authentic,,,data/preprocessed/crop200_align16/COCO2017_train_456670.png
+COCO2017_train/382728,data/authentic/images/COCO2017_train_382728.jpg,0,authentic,,,data/preprocessed/crop200_align16/COCO2017_train_382728.png
+COCO2017_train/464526,data/authentic/images/COCO2017_train_464526.jpg,0,authentic,,,data/preprocessed/crop200_align16/COCO2017_train_464526.png
+COCO2017_train/242248,data/authentic/images/COCO2017_train_242248.jpg,0,authentic,,,data/preprocessed/crop200_align16/COCO2017_train_242248.png
+COCO2017_train/64884,data/authentic/images/COCO2017_train_64884.jpg,0,authentic,,,data/preprocessed/crop200_align16/COCO2017_train_64884.png
+COCO2017_train/302740,data/authentic/images/COCO2017_train_302740.jpg,0,authentic,,,data/preprocessed/crop200_align16/COCO2017_train_302740.png
+COCO2017_train/157450,data/authentic/images/COCO2017_train_157450.jpg,0,authentic,,,data/preprocessed/crop200_align16/COCO2017_train_157450.png
+COCO2017_train/202067,data/authentic/images/COCO2017_train_202067.jpg,0,authentic,,,data/preprocessed/crop200_align16/COCO2017_train_202067.png
+COCO2017_train/540464,data/authentic/images/COCO2017_train_540464.jpg,0,authentic,,,data/preprocessed/crop200_align16/COCO2017_train_540464.png
+COCO2017_train/465963,data/authentic/images/COCO2017_train_465963.jpg,0,authentic,,,data/preprocessed/crop200_align16/COCO2017_train_465963.png
+COCO2017_train/16166,data/authentic/images/COCO2017_train_16166.jpg,0,authentic,,,data/preprocessed/crop200_align16/COCO2017_train_16166.png
+COCO2017_train/25994,data/authentic/images/COCO2017_train_25994.jpg,0,authentic,,,data/preprocessed/crop200_align16/COCO2017_train_25994.png
+COCO2017_train/75546,data/authentic/images/COCO2017_train_75546.jpg,0,authentic,,,data/preprocessed/crop200_align16/COCO2017_train_75546.png
+COCO2017_train/573854,data/authentic/images/COCO2017_train_573854.jpg,0,authentic,,,data/preprocessed/crop200_align16/COCO2017_train_573854.png
+COCO2017_train/162827,data/authentic/images/COCO2017_train_162827.jpg,0,authentic,,,data/preprocessed/crop200_align16/COCO2017_train_162827.png
+COCO2017_train/147506,data/authentic/images/COCO2017_train_147506.jpg,0,authentic,,,data/preprocessed/crop200_align16/COCO2017_train_147506.png
+COCO2017_train/194194,data/authentic/images/COCO2017_train_194194.jpg,0,authentic,,,data/preprocessed/crop200_align16/COCO2017_train_194194.png
+COCO2017_train/346345,data/authentic/images/COCO2017_train_346345.jpg,0,authentic,,,data/preprocessed/crop200_align16/COCO2017_train_346345.png
+COCO2017_train/493918,data/authentic/images/COCO2017_train_493918.jpg,0,authentic,,,data/preprocessed/crop200_align16/COCO2017_train_493918.png
+COCO2017_train/482371,data/authentic/images/COCO2017_train_482371.jpg,0,authentic,,,data/preprocessed/crop200_align16/COCO2017_train_482371.png
+COCO2017_train/395531,data/authentic/images/COCO2017_train_395531.jpg,0,authentic,,,data/preprocessed/crop200_align16/COCO2017_train_395531.png
+COCO2017_train/115422,data/authentic/images/COCO2017_train_115422.jpg,0,authentic,,,data/preprocessed/crop200_align16/COCO2017_train_115422.png
+COCO2017_train/86459,data/authentic/images/COCO2017_train_86459.jpg,0,authentic,,,data/preprocessed/crop200_align16/COCO2017_train_86459.png
+COCO2017_train/454554,data/authentic/images/COCO2017_train_454554.jpg,0,authentic,,,data/preprocessed/crop200_align16/COCO2017_train_454554.png
+COCO2017_train/334391,data/authentic/images/COCO2017_train_334391.jpg,0,authentic,,,data/preprocessed/crop200_align16/COCO2017_train_334391.png
+COCO2017_train/359234,data/authentic/images/COCO2017_train_359234.jpg,0,authentic,,,data/preprocessed/crop200_align16/COCO2017_train_359234.png
+COCO2017_train/107144,data/authentic/images/COCO2017_train_107144.jpg,0,authentic,,,data/preprocessed/crop200_align16/COCO2017_train_107144.png
+COCO2017_train/195073,data/authentic/images/COCO2017_train_195073.jpg,0,authentic,,,data/preprocessed/crop200_align16/COCO2017_train_195073.png
+COCO2017_train/436348,data/authentic/images/COCO2017_train_436348.jpg,0,authentic,,,data/preprocessed/crop200_align16/COCO2017_train_436348.png
+COCO2017_train/31867,data/authentic/images/COCO2017_train_31867.jpg,0,authentic,,,data/preprocessed/crop200_align16/COCO2017_train_31867.png
+COCO2017_train/403080,data/authentic/images/COCO2017_train_403080.jpg,0,authentic,,,data/preprocessed/crop200_align16/COCO2017_train_403080.png
+COCO2017_train/56400,data/authentic/images/COCO2017_train_56400.jpg,0,authentic,,,data/preprocessed/crop200_align16/COCO2017_train_56400.png
+COCO2017_train/525684,data/authentic/images/COCO2017_train_525684.jpg,0,authentic,,,data/preprocessed/crop200_align16/COCO2017_train_525684.png
+COCO2017_train/82414,data/authentic/images/COCO2017_train_82414.jpg,0,authentic,,,data/preprocessed/crop200_align16/COCO2017_train_82414.png
+COCO2017_train/496102,data/authentic/images/COCO2017_train_496102.jpg,0,authentic,,,data/preprocessed/crop200_align16/COCO2017_train_496102.png
+COCO2017_train/486738,data/authentic/images/COCO2017_train_486738.jpg,0,authentic,,,data/preprocessed/crop200_align16/COCO2017_train_486738.png
+LAION-400M/889223011455,data/authentic/images/LAION-400M_889223011455.jpg,0,authentic,,,data/preprocessed/crop200_align16/LAION-400M_889223011455.png
+LAION-400M/193693004993,data/authentic/images/LAION-400M_193693004993.jpg,0,authentic,,,data/preprocessed/crop200_align16/LAION-400M_193693004993.png
+LAION-400M/2077329019643,data/authentic/images/LAION-400M_2077329019643.jpg,0,authentic,,,data/preprocessed/crop200_align16/LAION-400M_2077329019643.png
+LAION-400M/2348540026947,data/authentic/images/LAION-400M_2348540026947.jpg,0,authentic,,,data/preprocessed/crop200_align16/LAION-400M_2348540026947.png
+LAION-400M/3717393013329,data/authentic/images/LAION-400M_3717393013329.jpg,0,authentic,,,data/preprocessed/crop200_align16/LAION-400M_3717393013329.png
+LAION-400M/2120862005837,data/authentic/images/LAION-400M_2120862005837.jpg,0,authentic,,,data/preprocessed/crop200_align16/LAION-400M_2120862005837.png
+LAION-400M/2295225014877,data/authentic/images/LAION-400M_2295225014877.jpg,0,authentic,,,data/preprocessed/crop200_align16/LAION-400M_2295225014877.png
+LAION-400M/96636002700,data/authentic/images/LAION-400M_96636002700.jpg,0,authentic,,,data/preprocessed/crop200_align16/LAION-400M_96636002700.png
+LAION-400M/2241449013425,data/authentic/images/LAION-400M_2241449013425.jpg,0,authentic,,,data/preprocessed/crop200_align16/LAION-400M_2241449013425.png
+LAION-400M/180130003215,data/authentic/images/LAION-400M_180130003215.jpg,0,authentic,,,data/preprocessed/crop200_align16/LAION-400M_180130003215.png
+LAION-400M/1280917007326,data/authentic/images/LAION-400M_1280917007326.jpg,0,authentic,,,data/preprocessed/crop200_align16/LAION-400M_1280917007326.png
+LAION-400M/1097111023669,data/authentic/images/LAION-400M_1097111023669.jpg,0,authentic,,,data/preprocessed/crop200_align16/LAION-400M_1097111023669.png
+LAION-400M/650714008239,data/authentic/images/LAION-400M_650714008239.jpg,0,authentic,,,data/preprocessed/crop200_align16/LAION-400M_650714008239.png
+LAION-400M/1710129010321,data/authentic/images/LAION-400M_1710129010321.jpg,0,authentic,,,data/preprocessed/crop200_align16/LAION-400M_1710129010321.png
+LAION-400M/1157970000708,data/authentic/images/LAION-400M_1157970000708.jpg,0,authentic,,,data/preprocessed/crop200_align16/LAION-400M_1157970000708.png
+LAION-400M/3585025013290,data/authentic/images/LAION-400M_3585025013290.jpg,0,authentic,,,data/preprocessed/crop200_align16/LAION-400M_3585025013290.png
+LAION-400M/1460299015226,data/authentic/images/LAION-400M_1460299015226.jpg,0,authentic,,,data/preprocessed/crop200_align16/LAION-400M_1460299015226.png
+LAION-400M/1622559020590,data/authentic/images/LAION-400M_1622559020590.jpg,0,authentic,,,data/preprocessed/crop200_align16/LAION-400M_1622559020590.png
+LAION-400M/2620587012068,data/authentic/images/LAION-400M_2620587012068.jpg,0,authentic,,,data/preprocessed/crop200_align16/LAION-400M_2620587012068.png
+LAION-400M/1014438028410,data/authentic/images/LAION-400M_1014438028410.jpg,0,authentic,,,data/preprocessed/crop200_align16/LAION-400M_1014438028410.png
+LAION-400M/3206597028957,data/authentic/images/LAION-400M_3206597028957.jpg,0,authentic,,,data/preprocessed/crop200_align16/LAION-400M_3206597028957.png
+LAION-400M/91691001556,data/authentic/images/LAION-400M_91691001556.jpg,0,authentic,,,data/preprocessed/crop200_align16/LAION-400M_91691001556.png
+LAION-400M/1275647005626,data/authentic/images/LAION-400M_1275647005626.jpg,0,authentic,,,data/preprocessed/crop200_align16/LAION-400M_1275647005626.png
+LAION-400M/2434816011109,data/authentic/images/LAION-400M_2434816011109.jpg,0,authentic,,,data/preprocessed/crop200_align16/LAION-400M_2434816011109.png
+LAION-400M/3467454012392,data/authentic/images/LAION-400M_3467454012392.jpg,0,authentic,,,data/preprocessed/crop200_align16/LAION-400M_3467454012392.png
+LAION-400M/2128787001879,data/authentic/images/LAION-400M_2128787001879.jpg,0,authentic,,,data/preprocessed/crop200_align16/LAION-400M_2128787001879.png
+LAION-400M/2624526022700,data/authentic/images/LAION-400M_2624526022700.jpg,0,authentic,,,data/preprocessed/crop200_align16/LAION-400M_2624526022700.png
+LAION-400M/74237009888,data/authentic/images/LAION-400M_74237009888.jpg,0,authentic,,,data/preprocessed/crop200_align16/LAION-400M_74237009888.png
+LAION-400M/3574298001242,data/authentic/images/LAION-400M_3574298001242.jpg,0,authentic,,,data/preprocessed/crop200_align16/LAION-400M_3574298001242.png
+LAION-400M/3399404015255,data/authentic/images/LAION-400M_3399404015255.jpg,0,authentic,,,data/preprocessed/crop200_align16/LAION-400M_3399404015255.png
+LAION-400M/57768007311,data/authentic/images/LAION-400M_57768007311.jpg,0,authentic,,,data/preprocessed/crop200_align16/LAION-400M_57768007311.png
+LAION-400M/76356009030,data/authentic/images/LAION-400M_76356009030.jpg,0,authentic,,,data/preprocessed/crop200_align16/LAION-400M_76356009030.png
+LAION-400M/192197000800,data/authentic/images/LAION-400M_192197000800.jpg,0,authentic,,,data/preprocessed/crop200_align16/LAION-400M_192197000800.png
+LAION-400M/2829498020518,data/authentic/images/LAION-400M_2829498020518.jpg,0,authentic,,,data/preprocessed/crop200_align16/LAION-400M_2829498020518.png
+LAION-400M/1012652013132,data/authentic/images/LAION-400M_1012652013132.jpg,0,authentic,,,data/preprocessed/crop200_align16/LAION-400M_1012652013132.png
+LAION-400M/192024005381,data/authentic/images/LAION-400M_192024005381.jpg,0,authentic,,,data/preprocessed/crop200_align16/LAION-400M_192024005381.png
+LAION-400M/3198316010281,data/authentic/images/LAION-400M_3198316010281.jpg,0,authentic,,,data/preprocessed/crop200_align16/LAION-400M_3198316010281.png
+LAION-400M/225386002708,data/authentic/images/LAION-400M_225386002708.jpg,0,authentic,,,data/preprocessed/crop200_align16/LAION-400M_225386002708.png
+LAION-400M/2335515001315,data/authentic/images/LAION-400M_2335515001315.jpg,0,authentic,,,data/preprocessed/crop200_align16/LAION-400M_2335515001315.png
+LAION-400M/2838625005618,data/authentic/images/LAION-400M_2838625005618.jpg,0,authentic,,,data/preprocessed/crop200_align16/LAION-400M_2838625005618.png
+LAION-400M/1173528025878,data/authentic/images/LAION-400M_1173528025878.jpg,0,authentic,,,data/preprocessed/crop200_align16/LAION-400M_1173528025878.png
+LAION-400M/2708420025981,data/authentic/images/LAION-400M_2708420025981.jpg,0,authentic,,,data/preprocessed/crop200_align16/LAION-400M_2708420025981.png
+LAION-400M/1512126011839,data/authentic/images/LAION-400M_1512126011839.jpg,0,authentic,,,data/preprocessed/crop200_align16/LAION-400M_1512126011839.png
+LAION-400M/2713043005140,data/authentic/images/LAION-400M_2713043005140.jpg,0,authentic,,,data/preprocessed/crop200_align16/LAION-400M_2713043005140.png
+LAION-400M/1896246006471,data/authentic/images/LAION-400M_1896246006471.jpg,0,authentic,,,data/preprocessed/crop200_align16/LAION-400M_1896246006471.png
+LAION-400M/3410558016910,data/authentic/images/LAION-400M_3410558016910.jpg,0,authentic,,,data/preprocessed/crop200_align16/LAION-400M_3410558016910.png
+LAION-400M/1083704002555,data/authentic/images/LAION-400M_1083704002555.jpg,0,authentic,,,data/preprocessed/crop200_align16/LAION-400M_1083704002555.png
+LAION-400M/3411639019200,data/authentic/images/LAION-400M_3411639019200.jpg,0,authentic,,,data/preprocessed/crop200_align16/LAION-400M_3411639019200.png
+LAION-400M/45428006550,data/authentic/images/LAION-400M_45428006550.jpg,0,authentic,,,data/preprocessed/crop200_align16/LAION-400M_45428006550.png
+LAION-400M/1397766012881,data/authentic/images/LAION-400M_1397766012881.jpg,0,authentic,,,data/preprocessed/crop200_align16/LAION-400M_1397766012881.png
+LAION-400M/3205683026205,data/authentic/images/LAION-400M_3205683026205.jpg,0,authentic,,,data/preprocessed/crop200_align16/LAION-400M_3205683026205.png
+LAION-400M/2383628019507,data/authentic/images/LAION-400M_2383628019507.jpg,0,authentic,,,data/preprocessed/crop200_align16/LAION-400M_2383628019507.png
+LAION-400M/123552006904,data/authentic/images/LAION-400M_123552006904.jpg,0,authentic,,,data/preprocessed/crop200_align16/LAION-400M_123552006904.png
+LAION-400M/2286517000288,data/authentic/images/LAION-400M_2286517000288.jpg,0,authentic,,,data/preprocessed/crop200_align16/LAION-400M_2286517000288.png
+LAION-400M/1386147017596,data/authentic/images/LAION-400M_1386147017596.jpg,0,authentic,,,data/preprocessed/crop200_align16/LAION-400M_1386147017596.png
+LAION-400M/3068691029219,data/authentic/images/LAION-400M_3068691029219.jpg,0,authentic,,,data/preprocessed/crop200_align16/LAION-400M_3068691029219.png
+LAION-400M/3604765010768,data/authentic/images/LAION-400M_3604765010768.jpg,0,authentic,,,data/preprocessed/crop200_align16/LAION-400M_3604765010768.png
+LAION-400M/2088222007650,data/authentic/images/LAION-400M_2088222007650.jpg,0,authentic,,,data/preprocessed/crop200_align16/LAION-400M_2088222007650.png
+LAION-400M/3095840013471,data/authentic/images/LAION-400M_3095840013471.jpg,0,authentic,,,data/preprocessed/crop200_align16/LAION-400M_3095840013471.png
+LAION-400M/3588190014293,data/authentic/images/LAION-400M_3588190014293.jpg,0,authentic,,,data/preprocessed/crop200_align16/LAION-400M_3588190014293.png
+LAION-400M/1000829006327,data/authentic/images/LAION-400M_1000829006327.jpg,0,authentic,,,data/preprocessed/crop200_align16/LAION-400M_1000829006327.png
+LAION-400M/714624004082,data/authentic/images/LAION-400M_714624004082.jpg,0,authentic,,,data/preprocessed/crop200_align16/LAION-400M_714624004082.png
+LAION-400M/2543075011055,data/authentic/images/LAION-400M_2543075011055.jpg,0,authentic,,,data/preprocessed/crop200_align16/LAION-400M_2543075011055.png
+LAION-400M/2635980003849,data/authentic/images/LAION-400M_2635980003849.jpg,0,authentic,,,data/preprocessed/crop200_align16/LAION-400M_2635980003849.png
+LAION-400M/1429987001025,data/authentic/images/LAION-400M_1429987001025.jpg,0,authentic,,,data/preprocessed/crop200_align16/LAION-400M_1429987001025.png
+LAION-400M/2823568018654,data/authentic/images/LAION-400M_2823568018654.jpg,0,authentic,,,data/preprocessed/crop200_align16/LAION-400M_2823568018654.png
+LAION-400M/193045010066,data/authentic/images/LAION-400M_193045010066.jpg,0,authentic,,,data/preprocessed/crop200_align16/LAION-400M_193045010066.png
+LAION-400M/191967000730,data/authentic/images/LAION-400M_191967000730.jpg,0,authentic,,,data/preprocessed/crop200_align16/LAION-400M_191967000730.png
+RAISE/r108ba35et,data/authentic/images/RAISE_r108ba35et.jpg,0,authentic,,,data/preprocessed/crop200_align16/RAISE_r108ba35et.png
+RAISE/r0d8d62edt,data/authentic/images/RAISE_r0d8d62edt.jpg,0,authentic,,,data/preprocessed/crop200_align16/RAISE_r0d8d62edt.png
+RAISE/r1a485a99t,data/authentic/images/RAISE_r1a485a99t.jpg,0,authentic,,,data/preprocessed/crop200_align16/RAISE_r1a485a99t.png
+RAISE/r1d53fccat,data/authentic/images/RAISE_r1d53fccat.jpg,0,authentic,,,data/preprocessed/crop200_align16/RAISE_r1d53fccat.png
+RAISE/r11865f77t,data/authentic/images/RAISE_r11865f77t.jpg,0,authentic,,,data/preprocessed/crop200_align16/RAISE_r11865f77t.png
+RAISE/r10940798t,data/authentic/images/RAISE_r10940798t.jpg,0,authentic,,,data/preprocessed/crop200_align16/RAISE_r10940798t.png
+RAISE/r0191aaf4t,data/authentic/images/RAISE_r0191aaf4t.jpg,0,authentic,,,data/preprocessed/crop200_align16/RAISE_r0191aaf4t.png
+RAISE/r1baf2ce0t,data/authentic/images/RAISE_r1baf2ce0t.jpg,0,authentic,,,data/preprocessed/crop200_align16/RAISE_r1baf2ce0t.png
+Artifact/cycle_gan/st/horse2zebra/img001392,data/fakes/images/Artifact_cycle_gan_st_horse2zebra_img001392.jpg,1,gan,2017-03-30,CycleGAN,data/preprocessed/crop200_align16/Artifact_cycle_gan_st_horse2zebra_img001392.png
+Artifact/cycle_gan/st/photo2monet/img014227,data/fakes/images/Artifact_cycle_gan_st_photo2monet_img014227.jpg,1,gan,2017-03-30,CycleGAN,data/preprocessed/crop200_align16/Artifact_cycle_gan_st_photo2monet_img014227.png
+Artifact/cycle_gan/st/photo2monet/img016097,data/fakes/images/Artifact_cycle_gan_st_photo2monet_img016097.jpg,1,gan,2017-03-30,CycleGAN,data/preprocessed/crop200_align16/Artifact_cycle_gan_st_photo2monet_img016097.png
+Forensynths/test/cyclegan/orange/1_fake/n07740461_13101_fake,data/fakes/images/Forensynths_test_cyclegan_orange_1_fake_n07740461_13101_fake.jpg,1,gan,2017-03-30,CycleGAN,data/preprocessed/crop200_align16/Forensynths_test_cyclegan_orange_1_fake_n07740461_13101_fake.png
+Forensynths/test/crn/1_fake/101035_output,data/fakes/images/Forensynths_test_crn_1_fake_101035_output.jpg,1,other,2017-07-28,Cascaded Refinement Networks,data/preprocessed/crop200_align16/Forensynths_test_crn_1_fake_101035_output.png
+Forensynths/test/crn/1_fake/102177_output,data/fakes/images/Forensynths_test_crn_1_fake_102177_output.jpg,1,other,2017-07-28,Cascaded Refinement Networks,data/preprocessed/crop200_align16/Forensynths_test_crn_1_fake_102177_output.png
+Forensynths/test/crn/1_fake/103292_output,data/fakes/images/Forensynths_test_crn_1_fake_103292_output.jpg,1,other,2017-07-28,Cascaded Refinement Networks,data/preprocessed/crop200_align16/Forensynths_test_crn_1_fake_103292_output.png
+Forensynths/test/crn/1_fake/104096_output,data/fakes/images/Forensynths_test_crn_1_fake_104096_output.jpg,1,other,2017-07-28,Cascaded Refinement Networks,data/preprocessed/crop200_align16/Forensynths_test_crn_1_fake_104096_output.png
+Artifact/pro_gan/pro/boat/1_fake/img007568,data/fakes/images/Artifact_pro_gan_pro_boat_1_fake_img007568.jpg,1,gan,2017-10-27,ProGAN,data/preprocessed/crop200_align16/Artifact_pro_gan_pro_boat_1_fake_img007568.png
+DMimageDetection/test/progan_lsun/bottle_06559,data/fakes/images/DMimageDetection_test_progan_lsun_bottle_06559.jpg,1,gan,2017-10-27,ProGAN,data/preprocessed/crop200_align16/DMimageDetection_test_progan_lsun_bottle_06559.png
+DMimageDetection/test/progan_lsun/bottle_11975,data/fakes/images/DMimageDetection_test_progan_lsun_bottle_11975.jpg,1,gan,2017-10-27,ProGAN,data/preprocessed/crop200_align16/DMimageDetection_test_progan_lsun_bottle_11975.png
+Forensynths/test/progan/bus/1_fake/05687,data/fakes/images/Forensynths_test_progan_bus_1_fake_05687.jpg,1,gan,2017-10-27,ProGAN,data/preprocessed/crop200_align16/Forensynths_test_progan_bus_1_fake_05687.png
+Artifact/star_gan/star/stargan/Blond_Hair/img003724,data/fakes/images/Artifact_star_gan_star_stargan_Blond_Hair_img003724.jpg,1,gan,2017-11-24,StarGAN,data/preprocessed/crop200_align16/Artifact_star_gan_star_stargan_Blond_Hair_img003724.png
+Artifact/star_gan/star/stargan/Male/img007943,data/fakes/images/Artifact_star_gan_star_stargan_Male_img007943.jpg,1,gan,2017-11-24,StarGAN,data/preprocessed/crop200_align16/Artifact_star_gan_star_stargan_Male_img007943.png
+Artifact/star_gan/star/stargan/Young/img008590,data/fakes/images/Artifact_star_gan_star_stargan_Young_img008590.jpg,1,gan,2017-11-24,StarGAN,data/preprocessed/crop200_align16/Artifact_star_gan_star_stargan_Young_img008590.png
+Artifact/star_gan/star/stargan/Young/img009119,data/fakes/images/Artifact_star_gan_star_stargan_Young_img009119.jpg,1,gan,2017-11-24,StarGAN,data/preprocessed/crop200_align16/Artifact_star_gan_star_stargan_Young_img009119.png
+Artifact/generative_inpainting/gc-in/gcinpaint-cutout-data/img000038,data/fakes/images/Artifact_generative_inpainting_gc-in_gcinpaint-cutout-data_img000038.jpg,1,inpainting,2018-06-10,SN-PatchGAN,data/preprocessed/crop200_align16/Artifact_generative_inpainting_gc-in_gcinpaint-cutout-data_img000038.png
+Artifact/generative_inpainting/gc-in/gcinpaint-cutout-data/img005724,data/fakes/images/Artifact_generative_inpainting_gc-in_gcinpaint-cutout-data_img005724.jpg,1,inpainting,2018-06-10,SN-PatchGAN,data/preprocessed/crop200_align16/Artifact_generative_inpainting_gc-in_gcinpaint-cutout-data_img005724.png
+Artifact/generative_inpainting/gc-in/gcinpaint-cutout-data/img007339,data/fakes/images/Artifact_generative_inpainting_gc-in_gcinpaint-cutout-data_img007339.jpg,1,inpainting,2018-06-10,SN-PatchGAN,data/preprocessed/crop200_align16/Artifact_generative_inpainting_gc-in_gcinpaint-cutout-data_img007339.png
+Artifact/generative_inpainting/gc-in/gcinpaint-cutout-data/img009343,data/fakes/images/Artifact_generative_inpainting_gc-in_gcinpaint-cutout-data_img009343.jpg,1,inpainting,2018-06-10,SN-PatchGAN,data/preprocessed/crop200_align16/Artifact_generative_inpainting_gc-in_gcinpaint-cutout-data_img009343.png
+Artifact/big_gan/big/biggan-data/549/img005000,data/fakes/images/Artifact_big_gan_big_biggan-data_549_img005000.jpg,1,gan,2018-09-28,BigGAN,data/preprocessed/crop200_align16/Artifact_big_gan_big_biggan-data_549_img005000.png
+DMimageDetection/test/biggan_256/biggan_140_547564,data/fakes/images/DMimageDetection_test_biggan_256_biggan_140_547564.jpg,1,gan,2018-09-28,BigGAN,data/preprocessed/crop200_align16/DMimageDetection_test_biggan_256_biggan_140_547564.png
+DMimageDetection/test/biggan_256/biggan_747_945727,data/fakes/images/DMimageDetection_test_biggan_256_biggan_747_945727.jpg,1,gan,2018-09-28,BigGAN,data/preprocessed/crop200_align16/DMimageDetection_test_biggan_256_biggan_747_945727.png
+Forensynths/test/biggan/1_fake/00318789,data/fakes/images/Forensynths_test_biggan_1_fake_00318789.jpg,1,gan,2018-09-28,BigGAN,data/preprocessed/crop200_align16/Forensynths_test_biggan_1_fake_00318789.png
+Forensynths/test/imle/1_fake/00101483,data/fakes/images/Forensynths_test_imle_1_fake_00101483.jpg,1,other,2018-11-29,IMLE,data/preprocessed/crop200_align16/Forensynths_test_imle_1_fake_00101483.png
+Forensynths/test/imle/1_fake/00101578,data/fakes/images/Forensynths_test_imle_1_fake_00101578.jpg,1,other,2018-11-29,IMLE,data/preprocessed/crop200_align16/Forensynths_test_imle_1_fake_00101578.png
+Forensynths/test/imle/1_fake/00102651,data/fakes/images/Forensynths_test_imle_1_fake_00102651.jpg,1,other,2018-11-29,IMLE,data/preprocessed/crop200_align16/Forensynths_test_imle_1_fake_00102651.png
+Forensynths/test/imle/1_fake/00103803,data/fakes/images/Forensynths_test_imle_1_fake_00103803.jpg,1,other,2018-11-29,IMLE,data/preprocessed/crop200_align16/Forensynths_test_imle_1_fake_00103803.png
+Artifact/stylegan1/sg1/1-million-fake-faces-6/1m_faces_76__90/1m_faces_81/img006521,data/fakes/images/Artifact_stylegan1_sg1_1-million-fake-faces-6_1m_faces_76__90_1m_faces_81_img006521.jpg,1,gan,2018-12-12,StyleGAN1,data/preprocessed/crop200_align16/Artifact_stylegan1_sg1_1-million-fake-faces-6_1m_faces_76__90_1m_faces_81_img006521.png
+Forensynths/test/stylegan/bedroom/1_fake/026148,data/fakes/images/Forensynths_test_stylegan_bedroom_1_fake_026148.jpg,1,gan,2018-12-12,StyleGAN1,data/preprocessed/crop200_align16/Forensynths_test_stylegan_bedroom_1_fake_026148.png
+Forensynths/test/stylegan/car/1_fake/007348,data/fakes/images/Forensynths_test_stylegan_car_1_fake_007348.jpg,1,gan,2018-12-12,StyleGAN1,data/preprocessed/crop200_align16/Forensynths_test_stylegan_car_1_fake_007348.png
+Forensynths/test/stylegan/car/1_fake/062718,data/fakes/images/Forensynths_test_stylegan_car_1_fake_062718.jpg,1,gan,2018-12-12,StyleGAN1,data/preprocessed/crop200_align16/Forensynths_test_stylegan_car_1_fake_062718.png
+Artifact/gau_gan/gau/gaugan-coco/img003947,data/fakes/images/Artifact_gau_gan_gau_gaugan-coco_img003947.jpg,1,gan,2019-03-18,GauGAN,data/preprocessed/crop200_align16/Artifact_gau_gan_gau_gaugan-coco_img003947.png
+Artifact/gau_gan/gau/gaugan-coco/img004675,data/fakes/images/Artifact_gau_gan_gau_gaugan-coco_img004675.jpg,1,gan,2019-03-18,GauGAN,data/preprocessed/crop200_align16/Artifact_gau_gan_gau_gaugan-coco_img004675.png
+Forensynths/test/gaugan/1_fake/000000249025,data/fakes/images/Forensynths_test_gaugan_1_fake_000000249025.jpg,1,gan,2019-03-18,GauGAN,data/preprocessed/crop200_align16/Forensynths_test_gaugan_1_fake_000000249025.png
+Forensynths/test/gaugan/1_fake/000000358525,data/fakes/images/Forensynths_test_gaugan_1_fake_000000358525.jpg,1,gan,2019-03-18,GauGAN,data/preprocessed/crop200_align16/Forensynths_test_gaugan_1_fake_000000358525.png
+Artifact/stylegan2/cat-part1/cat-256x256/stylegan2-config-f-psi-0.5/056000/img056321,data/fakes/images/Artifact_stylegan2_cat-part1_cat-256x256_stylegan2-config-f-psi-0.5_056000_img056321.jpg,1,gan,2019-12-03,StyleGAN2,data/preprocessed/crop200_align16/Artifact_stylegan2_cat-part1_cat-256x256_stylegan2-config-f-psi-0.5_056000_img056321.png
+Artifact/stylegan2/cat-part1/cat-256x256/stylegan2-config-f-psi-0.5/090000/img090204,data/fakes/images/Artifact_stylegan2_cat-part1_cat-256x256_stylegan2-config-f-psi-0.5_090000_img090204.jpg,1,gan,2019-12-03,StyleGAN2,data/preprocessed/crop200_align16/Artifact_stylegan2_cat-part1_cat-256x256_stylegan2-config-f-psi-0.5_090000_img090204.png
+Artifact/stylegan2/church-part1/church-256x256/stylegan2-config-f-psi-0.5/054000/img054821,data/fakes/images/Artifact_stylegan2_church-part1_church-256x256_stylegan2-config-f-psi-0.5_054000_img054821.jpg,1,gan,2019-12-03,StyleGAN2,data/preprocessed/crop200_align16/Artifact_stylegan2_church-part1_church-256x256_stylegan2-config-f-psi-0.5_054000_img054821.png
+Artifact/stylegan2/church-part2/church-256x256/stylegan2-config-f-psi-1.0/019000/img019126,data/fakes/images/Artifact_stylegan2_church-part2_church-256x256_stylegan2-config-f-psi-1.0_019000_img019126.jpg,1,gan,2019-12-03,StyleGAN2,data/preprocessed/crop200_align16/Artifact_stylegan2_church-part2_church-256x256_stylegan2-config-f-psi-1.0_019000_img019126.png
+Artifact/ddpm/ddpm/bedroom/img000473,data/fakes/images/Artifact_ddpm_ddpm_bedroom_img000473.jpg,1,diffusion,2020-06-19,DDPM,data/preprocessed/crop200_align16/Artifact_ddpm_ddpm_bedroom_img000473.png
+DDMD/diffusion_model_deepfakes_lsun_bedroom/test/DDPM/000958,data/fakes/images/DDMD_diffusion_model_deepfakes_lsun_bedroom_test_DDPM_000958.jpg,1,diffusion,2020-06-19,DDPM,data/preprocessed/crop200_align16/DDMD_diffusion_model_deepfakes_lsun_bedroom_test_DDPM_000958.png
+DDMD/diffusion_model_deepfakes_lsun_bedroom/test/DDPM/003719,data/fakes/images/DDMD_diffusion_model_deepfakes_lsun_bedroom_test_DDPM_003719.jpg,1,diffusion,2020-06-19,DDPM,data/preprocessed/crop200_align16/DDMD_diffusion_model_deepfakes_lsun_bedroom_test_DDPM_003719.png
+DDMD/diffusion_model_deepfakes_lsun_bedroom/test/DDPM/008624,data/fakes/images/DDMD_diffusion_model_deepfakes_lsun_bedroom_test_DDPM_008624.jpg,1,diffusion,2020-06-19,DDPM,data/preprocessed/crop200_align16/DDMD_diffusion_model_deepfakes_lsun_bedroom_test_DDPM_008624.png
+Artifact/cips/cips/cips-churces/img000404,data/fakes/images/Artifact_cips_cips_cips-churces_img000404.jpg,1,gan,2020-11-27,CIPS,data/preprocessed/crop200_align16/Artifact_cips_cips_cips-churces_img000404.png
+Artifact/cips/cips/cips-churces/img001069,data/fakes/images/Artifact_cips_cips_cips-churces_img001069.jpg,1,gan,2020-11-27,CIPS,data/preprocessed/crop200_align16/Artifact_cips_cips_cips-churces_img001069.png
+Artifact/cips/cips/cips-ffhq/img000104,data/fakes/images/Artifact_cips_cips_cips-ffhq_img000104.jpg,1,gan,2020-11-27,CIPS,data/preprocessed/crop200_align16/Artifact_cips_cips_cips-ffhq_img000104.png
+Artifact/cips/cips/cips-ffhq/img001261,data/fakes/images/Artifact_cips_cips_cips-ffhq_img001261.jpg,1,gan,2020-11-27,CIPS,data/preprocessed/crop200_align16/Artifact_cips_cips_cips-ffhq_img001261.png
+Artifact/taming_transformer/tt-cc/cin_k600_p1.0_a0.05_fid5.20/58/img026705,data/fakes/images/Artifact_taming_transformer_tt-cc_cin_k600_p1.0_a0.05_fid5.20_58_img026705.jpg,1,autoregressive,2020-12-17,VQGAN,data/preprocessed/crop200_align16/Artifact_taming_transformer_tt-cc_cin_k600_p1.0_a0.05_fid5.20_58_img026705.png
+Artifact/taming_transformer/tt-cc/cin_k600_p1.0_a0.05_fid5.20/730/img035125,data/fakes/images/Artifact_taming_transformer_tt-cc_cin_k600_p1.0_a0.05_fid5.20_730_img035125.jpg,1,autoregressive,2020-12-17,VQGAN,data/preprocessed/crop200_align16/Artifact_taming_transformer_tt-cc_cin_k600_p1.0_a0.05_fid5.20_730_img035125.png
+Artifact/taming_transformer/tt-coco/samples_nopix/img000199,data/fakes/images/Artifact_taming_transformer_tt-coco_samples_nopix_img000199.jpg,1,autoregressive,2020-12-17,VQGAN,data/preprocessed/crop200_align16/Artifact_taming_transformer_tt-coco_samples_nopix_img000199.png
+Artifact/taming_transformer/tt-ffhq/ffhq_k300_p1.0_fid9.6/img019652,data/fakes/images/Artifact_taming_transformer_tt-ffhq_ffhq_k300_p1.0_fid9.6_img019652.jpg,1,autoregressive,2020-12-17,VQGAN,data/preprocessed/crop200_align16/Artifact_taming_transformer_tt-ffhq_ffhq_k300_p1.0_fid9.6_img019652.png
+Artifact/gansformer/gf/bedrooms_images/img001687,data/fakes/images/Artifact_gansformer_gf_bedrooms_images_img001687.jpg,1,gan,2021-03-01,GANformer,data/preprocessed/crop200_align16/Artifact_gansformer_gf_bedrooms_images_img001687.png
+Artifact/gansformer/gf/bedrooms_images/img003516,data/fakes/images/Artifact_gansformer_gf_bedrooms_images_img003516.jpg,1,gan,2021-03-01,GANformer,data/preprocessed/crop200_align16/Artifact_gansformer_gf_bedrooms_images_img003516.png
+Artifact/gansformer/gf/bedrooms_images/img004173,data/fakes/images/Artifact_gansformer_gf_bedrooms_images_img004173.jpg,1,gan,2021-03-01,GANformer,data/preprocessed/crop200_align16/Artifact_gansformer_gf_bedrooms_images_img004173.png
+Artifact/gansformer/gf/ffhq_images/img007954,data/fakes/images/Artifact_gansformer_gf_ffhq_images_img007954.jpg,1,gan,2021-03-01,GANformer,data/preprocessed/crop200_align16/Artifact_gansformer_gf_ffhq_images_img007954.png
+DDMD/diffusion_model_deepfakes_lsun_bedroom/test/ADM/007830,data/fakes/images/DDMD_diffusion_model_deepfakes_lsun_bedroom_test_ADM_007830.jpg,1,diffusion,2021-05-11,ADM,data/preprocessed/crop200_align16/DDMD_diffusion_model_deepfakes_lsun_bedroom_test_ADM_007830.png
+GenImage/ADM/train/ai/560_adm_44,data/fakes/images/GenImage_ADM_train_ai_560_adm_44.jpg,1,diffusion,2021-05-11,ADM,data/preprocessed/crop200_align16/GenImage_ADM_train_ai_560_adm_44.png
+GenImage/ADM/train/ai/755_adm_178,data/fakes/images/GenImage_ADM_train_ai_755_adm_178.jpg,1,diffusion,2021-05-11,ADM,data/preprocessed/crop200_align16/GenImage_ADM_train_ai_755_adm_178.png
+GenImage/ADM/train/ai/825_adm_16,data/fakes/images/GenImage_ADM_train_ai_825_adm_16.jpg,1,diffusion,2021-05-11,ADM,data/preprocessed/crop200_align16/GenImage_ADM_train_ai_825_adm_16.png
+Artifact/stylegan3/sg3/stylegan3-r-ffhqu-256x256/img006137,data/fakes/images/Artifact_stylegan3_sg3_stylegan3-r-ffhqu-256x256_img006137.jpg,1,gan,2021-06-23,StyleGAN3,data/preprocessed/crop200_align16/Artifact_stylegan3_sg3_stylegan3-r-ffhqu-256x256_img006137.png
+Artifact/stylegan3/sg3/stylegan3-r-metfaces-1024x1024/img003656,data/fakes/images/Artifact_stylegan3_sg3_stylegan3-r-metfaces-1024x1024_img003656.jpg,1,gan,2021-06-23,StyleGAN3,data/preprocessed/crop200_align16/Artifact_stylegan3_sg3_stylegan3-r-metfaces-1024x1024_img003656.png
+DMimageDetection/test/stylegan3_t_ffhqu_1024x1024/seed68773317,data/fakes/images/DMimageDetection_test_stylegan3_t_ffhqu_1024x1024_seed68773317.jpg,1,gan,2021-06-23,StyleGAN3,data/preprocessed/crop200_align16/DMimageDetection_test_stylegan3_t_ffhqu_1024x1024_seed68773317.png
+Imaginet/wikiart_stylegan/seed3941,data/fakes/images/Imaginet_wikiart_stylegan_seed3941.jpg,1,gan,2021-06-23,StyleGAN3,data/preprocessed/crop200_align16/Imaginet_wikiart_stylegan_seed3941.png
+Artifact/lama/lama/lama-dataset/celeb/lamaDilated/img006341,data/fakes/images/Artifact_lama_lama_lama-dataset_celeb_lamaDilated_img006341.jpg,1,inpainting,2021-09-15,LaMa,data/preprocessed/crop200_align16/Artifact_lama_lama_lama-dataset_celeb_lamaDilated_img006341.png
+Artifact/lama/lama/lama-dataset/places/bigLama/img010891,data/fakes/images/Artifact_lama_lama_lama-dataset_places_bigLama_img010891.jpg,1,inpainting,2021-09-15,LaMa,data/preprocessed/crop200_align16/Artifact_lama_lama_lama-dataset_places_bigLama_img010891.png
+Artifact/lama/lama/lama-dataset/places/bigLama/img012832,data/fakes/images/Artifact_lama_lama_lama-dataset_places_bigLama_img012832.jpg,1,inpainting,2021-09-15,LaMa,data/preprocessed/crop200_align16/Artifact_lama_lama_lama-dataset_places_bigLama_img012832.png
+Artifact/lama/lama/lama-dataset/places/bigLama/img013778,data/fakes/images/Artifact_lama_lama_lama-dataset_places_bigLama_img013778.jpg,1,inpainting,2021-09-15,LaMa,data/preprocessed/crop200_align16/Artifact_lama_lama_lama-dataset_places_bigLama_img013778.png
+Artifact/face_synthetics/facesyn/images/img005447,data/fakes/images/Artifact_face_synthetics_facesyn_images_img005447.jpg,1,graphics,2021-09-30,FaceSynthetics,data/preprocessed/crop200_align16/Artifact_face_synthetics_facesyn_images_img005447.png
+Artifact/face_synthetics/facesyn/images/img008192,data/fakes/images/Artifact_face_synthetics_facesyn_images_img008192.jpg,1,graphics,2021-09-30,FaceSynthetics,data/preprocessed/crop200_align16/Artifact_face_synthetics_facesyn_images_img008192.png
+Artifact/face_synthetics/facesyn/images/img008935,data/fakes/images/Artifact_face_synthetics_facesyn_images_img008935.jpg,1,graphics,2021-09-30,FaceSynthetics,data/preprocessed/crop200_align16/Artifact_face_synthetics_facesyn_images_img008935.png
+Artifact/face_synthetics/facesyn/images/img008990,data/fakes/images/Artifact_face_synthetics_facesyn_images_img008990.jpg,1,graphics,2021-09-30,FaceSynthetics,data/preprocessed/crop200_align16/Artifact_face_synthetics_facesyn_images_img008990.png
+Artifact/projected_gan/proj/church/img004793,data/fakes/images/Artifact_projected_gan_proj_church_img004793.jpg,1,gan,2021-11-01,ProjectedGAN,data/preprocessed/crop200_align16/Artifact_projected_gan_proj_church_img004793.png
+Artifact/projected_gan/proj/cityscapes/img006315,data/fakes/images/Artifact_projected_gan_proj_cityscapes_img006315.jpg,1,gan,2021-11-01,ProjectedGAN,data/preprocessed/crop200_align16/Artifact_projected_gan_proj_cityscapes_img006315.png
+DDMD/diffusion_model_deepfakes_lsun_bedroom/test/ProjectedGAN/seed8365,data/fakes/images/DDMD_diffusion_model_deepfakes_lsun_bedroom_test_ProjectedGAN_seed8365.jpg,1,gan,2021-11-01,ProjectedGAN,data/preprocessed/crop200_align16/DDMD_diffusion_model_deepfakes_lsun_bedroom_test_ProjectedGAN_seed8365.png
+DDMD/diffusion_model_deepfakes_lsun_bedroom/test/ProjectedGAN/seed9247,data/fakes/images/DDMD_diffusion_model_deepfakes_lsun_bedroom_test_ProjectedGAN_seed9247.jpg,1,gan,2021-11-01,ProjectedGAN,data/preprocessed/crop200_align16/DDMD_diffusion_model_deepfakes_lsun_bedroom_test_ProjectedGAN_seed9247.png
+Artifact/palette/palette/images/img001540,data/fakes/images/Artifact_palette_palette_images_img001540.jpg,1,diffusion,2021-11-10,Palette,data/preprocessed/crop200_align16/Artifact_palette_palette_images_img001540.png
+Artifact/palette/palette/images/img002292,data/fakes/images/Artifact_palette_palette_images_img002292.jpg,1,diffusion,2021-11-10,Palette,data/preprocessed/crop200_align16/Artifact_palette_palette_images_img002292.png
+Artifact/palette/palette/images/img003593,data/fakes/images/Artifact_palette_palette_images_img003593.jpg,1,diffusion,2021-11-10,Palette,data/preprocessed/crop200_align16/Artifact_palette_palette_images_img003593.png
+Artifact/palette/palette/images/img004060,data/fakes/images/Artifact_palette_palette_images_img004060.jpg,1,diffusion,2021-11-10,Palette,data/preprocessed/crop200_align16/Artifact_palette_palette_images_img004060.png
+Artifact/vq_diffusion/vqdiff-imgnet/209/img001239,data/fakes/images/Artifact_vq_diffusion_vqdiff-imgnet_209_img001239.jpg,1,diffusion,2021-11-29,VQ-Diffusion,data/preprocessed/crop200_align16/Artifact_vq_diffusion_vqdiff-imgnet_209_img001239.png
+Artifact/vq_diffusion/vqdiff-imgnet/261/img001811,data/fakes/images/Artifact_vq_diffusion_vqdiff-imgnet_261_img001811.jpg,1,diffusion,2021-11-29,VQ-Diffusion,data/preprocessed/crop200_align16/Artifact_vq_diffusion_vqdiff-imgnet_261_img001811.png
+Artifact/vq_diffusion/vqdiff-imgnet/285/img002078,data/fakes/images/Artifact_vq_diffusion_vqdiff-imgnet_285_img002078.jpg,1,diffusion,2021-11-29,VQ-Diffusion,data/preprocessed/crop200_align16/Artifact_vq_diffusion_vqdiff-imgnet_285_img002078.png
+Artifact/vq_diffusion/vqdiff-imgnet/582/img005371,data/fakes/images/Artifact_vq_diffusion_vqdiff-imgnet_582_img005371.jpg,1,diffusion,2021-11-29,VQ-Diffusion,data/preprocessed/crop200_align16/Artifact_vq_diffusion_vqdiff-imgnet_582_img005371.png
+Artifact/denoising_diffusion_gan/dgd/denoising-diffusion-gan-data/img001808,data/fakes/images/Artifact_denoising_diffusion_gan_dgd_denoising-diffusion-gan-data_img001808.jpg,1,diffusion,2021-12-16,Denoising Diffusion GAN,data/preprocessed/crop200_align16/Artifact_denoising_diffusion_gan_dgd_denoising-diffusion-gan-data_img001808.png
+Artifact/denoising_diffusion_gan/dgd/denoising-diffusion-gan-data/img002669,data/fakes/images/Artifact_denoising_diffusion_gan_dgd_denoising-diffusion-gan-data_img002669.jpg,1,diffusion,2021-12-16,Denoising Diffusion GAN,data/preprocessed/crop200_align16/Artifact_denoising_diffusion_gan_dgd_denoising-diffusion-gan-data_img002669.png
+Artifact/denoising_diffusion_gan/dgd/denoising-diffusion-gan-data/img004888,data/fakes/images/Artifact_denoising_diffusion_gan_dgd_denoising-diffusion-gan-data_img004888.jpg,1,diffusion,2021-12-16,Denoising Diffusion GAN,data/preprocessed/crop200_align16/Artifact_denoising_diffusion_gan_dgd_denoising-diffusion-gan-data_img004888.png
+Artifact/denoising_diffusion_gan/dgd/denoising-diffusion-gan-data/img008049,data/fakes/images/Artifact_denoising_diffusion_gan_dgd_denoising-diffusion-gan-data_img008049.jpg,1,diffusion,2021-12-16,Denoising Diffusion GAN,data/preprocessed/crop200_align16/Artifact_denoising_diffusion_gan_dgd_denoising-diffusion-gan-data_img008049.png
+Artifact/glide/glide-in/images/img007640,data/fakes/images/Artifact_glide_glide-in_images_img007640.jpg,1,diffusion,2021-12-20,Glide,data/preprocessed/crop200_align16/Artifact_glide_glide-in_images_img007640.png
+DMimageDetection/test/glide_text2img_valid/ann000000219834,data/fakes/images/DMimageDetection_test_glide_text2img_valid_ann000000219834.jpg,1,diffusion,2021-12-20,Glide,data/preprocessed/crop200_align16/DMimageDetection_test_glide_text2img_valid_ann000000219834.png
+GenImage/Glide/train/ai/GLIDE_1000_200_03_302_glide_00096,data/fakes/images/GenImage_Glide_train_ai_GLIDE_1000_200_03_302_glide_00096.jpg,1,diffusion,2021-12-20,Glide,data/preprocessed/crop200_align16/GenImage_Glide_train_ai_GLIDE_1000_200_03_302_glide_00096.png
+GenImage/Glide/train/ai/GLIDE_1000_200_03_302_glide_00186,data/fakes/images/GenImage_Glide_train_ai_GLIDE_1000_200_03_302_glide_00186.jpg,1,diffusion,2021-12-20,Glide,data/preprocessed/crop200_align16/GenImage_Glide_train_ai_GLIDE_1000_200_03_302_glide_00186.png
+Artifact/latent_diffusion/latentdiff/153/img000611,data/fakes/images/Artifact_latent_diffusion_latentdiff_153_img000611.jpg,1,diffusion,2021-12-21,Latent Diffusion,data/preprocessed/crop200_align16/Artifact_latent_diffusion_latentdiff_153_img000611.png
+Artifact/latent_diffusion/latentdiff/347/img002763,data/fakes/images/Artifact_latent_diffusion_latentdiff_347_img002763.jpg,1,diffusion,2021-12-21,Latent Diffusion,data/preprocessed/crop200_align16/Artifact_latent_diffusion_latentdiff_347_img002763.png
+DDMD/diffusion_model_deepfakes_lsun_bedroom/test/LDM/sample_004325,data/fakes/images/DDMD_diffusion_model_deepfakes_lsun_bedroom_test_LDM_sample_004325.jpg,1,diffusion,2021-12-21,Latent Diffusion,data/preprocessed/crop200_align16/DDMD_diffusion_model_deepfakes_lsun_bedroom_test_LDM_sample_004325.png
+DDMD/diffusion_model_deepfakes_lsun_bedroom/test/LDM/sample_005446,data/fakes/images/DDMD_diffusion_model_deepfakes_lsun_bedroom_test_LDM_sample_005446.jpg,1,diffusion,2021-12-21,Latent Diffusion,data/preprocessed/crop200_align16/DDMD_diffusion_model_deepfakes_lsun_bedroom_test_LDM_sample_005446.png
+GenImage/Midjourney/train/ai/242_midjourney_92,data/fakes/images/GenImage_Midjourney_train_ai_242_midjourney_92.jpg,1,diffusion,2022-02-01,Midjourney,data/preprocessed/crop200_align16/GenImage_Midjourney_train_ai_242_midjourney_92.png
+GenImage/Midjourney/train/ai/308_midjourney_45,data/fakes/images/GenImage_Midjourney_train_ai_308_midjourney_45.jpg,1,diffusion,2022-02-01,Midjourney,data/preprocessed/crop200_align16/GenImage_Midjourney_train_ai_308_midjourney_45.png
+GenImage/Midjourney/train/ai/520_midjourney_134,data/fakes/images/GenImage_Midjourney_train_ai_520_midjourney_134.jpg,1,diffusion,2022-02-01,Midjourney,data/preprocessed/crop200_align16/GenImage_Midjourney_train_ai_520_midjourney_134.png
+GenImage/Midjourney/train/ai/816_midjourney_83,data/fakes/images/GenImage_Midjourney_train_ai_816_midjourney_83.jpg,1,diffusion,2022-02-01,Midjourney,data/preprocessed/crop200_align16/GenImage_Midjourney_train_ai_816_midjourney_83.png
+Artifact/mat/mat/celebahq/img001533,data/fakes/images/Artifact_mat_mat_celebahq_img001533.jpg,1,inpainting,2022-03-29,MAT,data/preprocessed/crop200_align16/Artifact_mat_mat_celebahq_img001533.png
+Artifact/mat/mat/celebahq/img003872,data/fakes/images/Artifact_mat_mat_celebahq_img003872.jpg,1,inpainting,2022-03-29,MAT,data/preprocessed/crop200_align16/Artifact_mat_mat_celebahq_img003872.png
+Artifact/mat/mat/landscape/img037721,data/fakes/images/Artifact_mat_mat_landscape_img037721.jpg,1,inpainting,2022-03-29,MAT,data/preprocessed/crop200_align16/Artifact_mat_mat_landscape_img037721.png
+Artifact/mat/mat/landscape/img043243,data/fakes/images/Artifact_mat_mat_landscape_img043243.jpg,1,inpainting,2022-03-29,MAT,data/preprocessed/crop200_align16/Artifact_mat_mat_landscape_img043243.png
+Artifact/diffusion_gan/diff/lsun-bedroom/Diffusion-ProjectedGAN-LSUN-Bed/img001469,data/fakes/images/Artifact_diffusion_gan_diff_lsun-bedroom_Diffusion-ProjectedGAN-LSUN-Bed_img001469.jpg,1,gan,2022-06-05,Diffusion GAN (ProjectedGAN),data/preprocessed/crop200_align16/Artifact_diffusion_gan_diff_lsun-bedroom_Diffusion-ProjectedGAN-LSUN-Bed_img001469.png
+Artifact/diffusion_gan/diff/lsun-church-data/Diffusion-ProjectedGAN-LSUN-Church/img000495,data/fakes/images/Artifact_diffusion_gan_diff_lsun-church-data_Diffusion-ProjectedGAN-LSUN-Church_img000495.jpg,1,gan,2022-06-05,Diffusion GAN (ProjectedGAN),data/preprocessed/crop200_align16/Artifact_diffusion_gan_diff_lsun-church-data_Diffusion-ProjectedGAN-LSUN-Church_img000495.png
+DDMD/diffusion_model_deepfakes_lsun_bedroom/test/Diff-ProjectedGAN/seed4541,data/fakes/images/DDMD_diffusion_model_deepfakes_lsun_bedroom_test_Diff-ProjectedGAN_seed4541.jpg,1,gan,2022-06-05,Diffusion GAN (ProjectedGAN),data/preprocessed/crop200_align16/DDMD_diffusion_model_deepfakes_lsun_bedroom_test_Diff-ProjectedGAN_seed4541.png
+DDMD/diffusion_model_deepfakes_lsun_bedroom/test/Diff-ProjectedGAN/seed5094,data/fakes/images/DDMD_diffusion_model_deepfakes_lsun_bedroom_test_Diff-ProjectedGAN_seed5094.jpg,1,gan,2022-06-05,Diffusion GAN (ProjectedGAN),data/preprocessed/crop200_align16/DDMD_diffusion_model_deepfakes_lsun_bedroom_test_Diff-ProjectedGAN_seed5094.png
+DDMD/diffusion_model_deepfakes_lsun_bedroom/test/Diff-StyleGAN2/seed1340,data/fakes/images/DDMD_diffusion_model_deepfakes_lsun_bedroom_test_Diff-StyleGAN2_seed1340.jpg,1,gan,2022-06-06,Diffusion GAN (StyleGAN2),data/preprocessed/crop200_align16/DDMD_diffusion_model_deepfakes_lsun_bedroom_test_Diff-StyleGAN2_seed1340.png
+DDMD/diffusion_model_deepfakes_lsun_bedroom/test/Diff-StyleGAN2/seed4127,data/fakes/images/DDMD_diffusion_model_deepfakes_lsun_bedroom_test_Diff-StyleGAN2_seed4127.jpg,1,gan,2022-06-06,Diffusion GAN (StyleGAN2),data/preprocessed/crop200_align16/DDMD_diffusion_model_deepfakes_lsun_bedroom_test_Diff-StyleGAN2_seed4127.png
+DDMD/diffusion_model_deepfakes_lsun_bedroom/test/Diff-StyleGAN2/seed5258,data/fakes/images/DDMD_diffusion_model_deepfakes_lsun_bedroom_test_Diff-StyleGAN2_seed5258.jpg,1,gan,2022-06-06,Diffusion GAN (StyleGAN2),data/preprocessed/crop200_align16/DDMD_diffusion_model_deepfakes_lsun_bedroom_test_Diff-StyleGAN2_seed5258.png
+DDMD/diffusion_model_deepfakes_lsun_bedroom/test/Diff-StyleGAN2/seed9483,data/fakes/images/DDMD_diffusion_model_deepfakes_lsun_bedroom_test_Diff-StyleGAN2_seed9483.jpg,1,gan,2022-06-06,Diffusion GAN (StyleGAN2),data/preprocessed/crop200_align16/DDMD_diffusion_model_deepfakes_lsun_bedroom_test_Diff-StyleGAN2_seed9483.png
+ELSA_D3/train/row1370343/image_gen1,data/fakes/images/ELSA_D3_train_row1370343_image_gen1.jpg,1,diffusion,2022-08-22,Stable Diffusion 1.4,data/preprocessed/crop200_align16/ELSA_D3_train_row1370343_image_gen1.png
+ELSA_D3/train/row1968048/image_gen1,data/fakes/images/ELSA_D3_train_row1968048_image_gen1.jpg,1,diffusion,2022-08-22,Stable Diffusion 1.4,data/preprocessed/crop200_align16/ELSA_D3_train_row1968048_image_gen1.png
+ELSA_D3/train/row2105749/image_gen1,data/fakes/images/ELSA_D3_train_row2105749_image_gen1.jpg,1,diffusion,2022-08-22,Stable Diffusion 1.4,data/preprocessed/crop200_align16/ELSA_D3_train_row2105749_image_gen1.png
+Synthbuster/stable-diffusion-1-4/r1d4377f7t,data/fakes/images/Synthbuster_stable-diffusion-1-4_r1d4377f7t.jpg,1,diffusion,2022-08-22,Stable Diffusion 1.4,data/preprocessed/crop200_align16/Synthbuster_stable-diffusion-1-4_r1d4377f7t.png
+Aeroblade/runwayml-stable-diffusion-v1-5-ViT-L-14-openai/000033446,data/fakes/images/Aeroblade_runwayml-stable-diffusion-v1-5-ViT-L-14-openai_000033446.jpg,1,diffusion,2022-10-20,Stable Diffusion 1.5,data/preprocessed/crop200_align16/Aeroblade_runwayml-stable-diffusion-v1-5-ViT-L-14-openai_000033446.png
+DRCT/stable-diffusion-v1-5/train2017/000000038929,data/fakes/images/DRCT_stable-diffusion-v1-5_train2017_000000038929.jpg,1,diffusion,2022-10-20,Stable Diffusion 1.5,data/preprocessed/crop200_align16/DRCT_stable-diffusion-v1-5_train2017_000000038929.png
+DRCT/stable-diffusion-v1-5/train2017/000000075810,data/fakes/images/DRCT_stable-diffusion-v1-5_train2017_000000075810.jpg,1,diffusion,2022-10-20,Stable Diffusion 1.5,data/preprocessed/crop200_align16/DRCT_stable-diffusion-v1-5_train2017_000000075810.png
+GenImage/Stable Diffusion 1.5/train/ai/583_sdv5_00060,data/fakes/images/GenImage_Stable Diffusion 1.5_train_ai_583_sdv5_00060.jpg,1,diffusion,2022-10-20,Stable Diffusion 1.5,data/preprocessed/crop200_align16/GenImage_Stable Diffusion 1.5_train_ai_583_sdv5_00060.png
+Aeroblade/stabilityai-stable-diffusion-2-1-base-ViT-H-14-laion2b_s32b_b79k/000016454,data/fakes/images/Aeroblade_stabilityai-stable-diffusion-2-1-base-ViT-H-14-laion2b_s32b_b79k_000016454.jpg,1,diffusion,2022-12-07,Stable Diffusion 2.1,data/preprocessed/crop200_align16/Aeroblade_stabilityai-stable-diffusion-2-1-base-ViT-H-14-laion2b_s32b_b79k_000016454.png
+DRCT/stable-diffusion-2-1/train2017/000000149832,data/fakes/images/DRCT_stable-diffusion-2-1_train2017_000000149832.jpg,1,diffusion,2022-12-07,Stable Diffusion 2.1,data/preprocessed/crop200_align16/DRCT_stable-diffusion-2-1_train2017_000000149832.png
+ELSA_D3/validation/row3648/image_gen2,data/fakes/images/ELSA_D3_validation_row3648_image_gen2.jpg,1,diffusion,2022-12-07,Stable Diffusion 2.1,data/preprocessed/crop200_align16/ELSA_D3_validation_row3648_image_gen2.png
+ELSA_D3/validation/row4205/image_gen2,data/fakes/images/ELSA_D3_validation_row4205_image_gen2.jpg,1,diffusion,2022-12-07,Stable Diffusion 2.1,data/preprocessed/crop200_align16/ELSA_D3_validation_row4205_image_gen2.png
+ELSA_D3/train/row1081061/image_gen0,data/fakes/images/ELSA_D3_train_row1081061_image_gen0.jpg,1,diffusion,2023-04-26,DeepFloyd IF,data/preprocessed/crop200_align16/ELSA_D3_train_row1081061_image_gen0.png
+ELSA_D3/train/row368180/image_gen0,data/fakes/images/ELSA_D3_train_row368180_image_gen0.jpg,1,diffusion,2023-04-26,DeepFloyd IF,data/preprocessed/crop200_align16/ELSA_D3_train_row368180_image_gen0.png
+ELSA_D3/train/row439772/image_gen0,data/fakes/images/ELSA_D3_train_row439772_image_gen0.jpg,1,diffusion,2023-04-26,DeepFloyd IF,data/preprocessed/crop200_align16/ELSA_D3_train_row439772_image_gen0.png
+ELSA_D3/validation/row836/image_gen0,data/fakes/images/ELSA_D3_validation_row836_image_gen0.jpg,1,diffusion,2023-04-26,DeepFloyd IF,data/preprocessed/crop200_align16/ELSA_D3_validation_row836_image_gen0.png
+ELSA_D3/train/row1180190/image_gen3,data/fakes/images/ELSA_D3_train_row1180190_image_gen3.jpg,1,diffusion,2023-07-26,Stable Diffusion XL 1.0,data/preprocessed/crop200_align16/ELSA_D3_train_row1180190_image_gen3.png
+ELSA_D3/validation/row1473/image_gen3,data/fakes/images/ELSA_D3_validation_row1473_image_gen3.jpg,1,diffusion,2023-07-26,Stable Diffusion XL 1.0,data/preprocessed/crop200_align16/ELSA_D3_validation_row1473_image_gen3.png
+Imaginet/sdxl_photos_fake/acfe4cdd-f0d1-4aaf-a6db-aff075e604ed,data/fakes/images/Imaginet_sdxl_photos_fake_acfe4cdd-f0d1-4aaf-a6db-aff075e604ed.jpg,1,diffusion,2023-07-26,Stable Diffusion XL 1.0,data/preprocessed/crop200_align16/Imaginet_sdxl_photos_fake_acfe4cdd-f0d1-4aaf-a6db-aff075e604ed.png
+Synthbuster/stable-diffusion-xl/r1b262b72t,data/fakes/images/Synthbuster_stable-diffusion-xl_r1b262b72t.jpg,1,diffusion,2023-07-26,Stable Diffusion XL 1.0,data/preprocessed/crop200_align16/Synthbuster_stable-diffusion-xl_r1b262b72t.png
+Imaginet/dalle3/cd1a1629-17b7-4f0f-bad0-8bdedec4549c,data/fakes/images/Imaginet_dalle3_cd1a1629-17b7-4f0f-bad0-8bdedec4549c.jpg,1,diffusion,2023-09-20,DALL-E 3,data/preprocessed/crop200_align16/Imaginet_dalle3_cd1a1629-17b7-4f0f-bad0-8bdedec4549c.png
+Imaginet/dalle3/cec30a91-cf30-4394-88f7-c73f61db9efe,data/fakes/images/Imaginet_dalle3_cec30a91-cf30-4394-88f7-c73f61db9efe.jpg,1,diffusion,2023-09-20,DALL-E 3,data/preprocessed/crop200_align16/Imaginet_dalle3_cec30a91-cf30-4394-88f7-c73f61db9efe.png
+Imaginet/dalle3_addition2/a4ab45c5-c8f8-4241-9251-b9b3a678431c,data/fakes/images/Imaginet_dalle3_addition2_a4ab45c5-c8f8-4241-9251-b9b3a678431c.jpg,1,diffusion,2023-09-20,DALL-E 3,data/preprocessed/crop200_align16/Imaginet_dalle3_addition2_a4ab45c5-c8f8-4241-9251-b9b3a678431c.png
+Polardiffshield/Dall-e-3/00000119,data/fakes/images/Polardiffshield_Dall-e-3_00000119.jpg,1,diffusion,2023-09-20,DALL-E 3,data/preprocessed/crop200_align16/Polardiffshield_Dall-e-3_00000119.png
+SFHQ-T2I/FLUX1_dev_image_0000846,data/fakes/images/SFHQ-T2I_FLUX1_dev_image_0000846.jpg,1,diffusion,2024-08-01,FLUX 1 Dev,data/preprocessed/crop200_align16/SFHQ-T2I_FLUX1_dev_image_0000846.png
+SFHQ-T2I/FLUX1_dev_image_0001750,data/fakes/images/SFHQ-T2I_FLUX1_dev_image_0001750.jpg,1,diffusion,2024-08-01,FLUX 1 Dev,data/preprocessed/crop200_align16/SFHQ-T2I_FLUX1_dev_image_0001750.png
+SFHQ-T2I/FLUX1_dev_image_0002900,data/fakes/images/SFHQ-T2I_FLUX1_dev_image_0002900.jpg,1,diffusion,2024-08-01,FLUX 1 Dev,data/preprocessed/crop200_align16/SFHQ-T2I_FLUX1_dev_image_0002900.png
+SFHQ-T2I/FLUX1_dev_image_0003196,data/fakes/images/SFHQ-T2I_FLUX1_dev_image_0003196.jpg,1,diffusion,2024-08-01,FLUX 1 Dev,data/preprocessed/crop200_align16/SFHQ-T2I_FLUX1_dev_image_0003196.png
+SFHQ-T2I/FLUX1_schnell_image_0001144,data/fakes/images/SFHQ-T2I_FLUX1_schnell_image_0001144.jpg,1,diffusion,2024-08-02,FLUX 1 Schnell,data/preprocessed/crop200_align16/SFHQ-T2I_FLUX1_schnell_image_0001144.png
+SFHQ-T2I/FLUX1_schnell_image_0015495,data/fakes/images/SFHQ-T2I_FLUX1_schnell_image_0015495.jpg,1,diffusion,2024-08-02,FLUX 1 Schnell,data/preprocessed/crop200_align16/SFHQ-T2I_FLUX1_schnell_image_0015495.png
+SFHQ-T2I/FLUX1_schnell_image_0027065,data/fakes/images/SFHQ-T2I_FLUX1_schnell_image_0027065.jpg,1,diffusion,2024-08-02,FLUX 1 Schnell,data/preprocessed/crop200_align16/SFHQ-T2I_FLUX1_schnell_image_0027065.png
+SFHQ-T2I/FLUX1_schnell_image_0033113,data/fakes/images/SFHQ-T2I_FLUX1_schnell_image_0033113.jpg,1,diffusion,2024-08-02,FLUX 1 Schnell,data/preprocessed/crop200_align16/SFHQ-T2I_FLUX1_schnell_image_0033113.png

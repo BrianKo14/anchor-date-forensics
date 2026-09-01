@@ -1,0 +1,29 @@
+{
+  "detector": "dmimagedetection_progan",
+  "score_semantics": "logit_spatial_mean",
+  "score_orientation": "higher_is_more_synthetic",
+  "upstream_repo": "https://github.com/grip-unina/DMimageDetection",
+  "upstream_commit": "745ad9e1eee82bdac4aab6e1e7e7dbf20753633a",
+  "weights": [
+    {
+      "path": "detectors/dmimagedetection/DMimageDetection/test_code/weights/Grag2021_progan/model_epoch_best.pth",
+      "sha256": "25ac8e1614fc3e6ab4a3325948b758e4be6273e713ada71f53d46d9b64070f81"
+    }
+  ],
+  "manifest": {
+    "path": "manifest.csv",
+    "sha256": "7260fdc0a0053af1c1e2e30301533898b3af01db0dce25ff774af27ffb948026",
+    "rows": 288
+  },
+  "crop_policy": "crop200_align16",
+  "runtime": {
+    "device": "cpu",
+    "torch": "2.5.1",
+    "python": "3.12.14",
+    "platform": "macOS-26.5.1-arm64-arm-64bit"
+  },
+  "elapsed_s": 480.1,
+  "generated_at": "2026-09-01T15:14:38+00:00",
+  "checkpoint": "Grag2021_progan",
+  "preprocessing": "shared 200x200 crop; get_list_norm('resnet'); no additional crop"
+}

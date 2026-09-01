@@ -66,6 +66,32 @@ Then explore it with `sample.ipynb`, with the repo root as the working directory
   [loki.disi.unitn.it/RAISE](http://loki.disi.unitn.it/RAISE/confirm.php?package=all); the step is
   skipped if the file is absent.
 - **No archival scans.** RAISE is camera-raw, not digitized print or film.
+- **The detector panel uses 200x200 crops, not native resolution.** All detectors read the shared
+  `crop200_align16` cache. This avoids padding artifacts from `CenterCrop(224)` on small images,
+  avoids huge full-resolution activations, and keeps panel scores comparable. Crop origins are
+  aligned to 16, outputs are lossless PNG, and CLIP ViT-L/14 is uniformly upscaled 200->224.
+
+## Detector panel
+
+Four published detectors -- CNNDetection, UniversalFakeDetect, DMimageDetection (two
+checkpoints) and AEROBLADE -- each in its own virtualenv, producing raw pre-threshold scores.
+
+```sh
+./run_all.sh                # score every image in manifest.csv (~57 min on cpu)
+DEVICE=mps ./run_all.sh     # faster; cpu is the default and is bit-reproducible
+```
+
+This writes `scores/<detector>.csv` (`image_id,raw_score`) plus a `.meta.json` sidecar per
+detector recording the weights, upstream commit and library pins the scores came from.
+`merge_scores.ipynb` joins them into `scores/master_scores.csv` and plots the results.
+
+Scores are logits (or, for AEROBLADE, a negated reconstruction distance), never binarized
+verdicts, and all are oriented **higher = more synthetic**.
+
+Setup, weight provenance, pin rationale and the upstream bugs worked around are in
+[`detectors/README.md`](detectors/README.md). One caveat carried by the current scores:
+AEROBLADE ran with 2 of its 3 autoencoders, because Stability gated the
+`stabilityai/stable-diffusion-2*` repos.
 
 ## Layout
 
@@ -76,9 +102,20 @@ imports/sample/     one-time importers
   imaging.py       decoding and JPEG normalization -- one prepare_image, used by both halves
   authentic.py     entry point for the real half
   fakes.py         entry point for the synthetic half
+build_manifest.py          sample -> manifest.csv (+ the generator family map)
+preprocess_crop_cache.py   the crop cache the panel reads
 sample.ipynb       read the sample
 data/              the sample itself (gitignored)
+detectors/         the detector panel: one venv, clone and run_score.py each
+manifest.csv       image_id, path, label, generator_family, release_date, generator, crop_path
+run_all.sh         score manifest.csv with all four detectors
+scores/            one <detector>.csv + .meta.json each, and master_scores.csv
+merge_scores.ipynb join the scores and look at them
 ```
+
+`build_manifest.py` and `preprocess_crop_cache.py` sit in `imports/`, not `imports/sample/`:
+`imports/sample/` is the one-time construction of the sample itself, while those two are
+re-run whenever the manifest or crop policy changes.
 
 ## Notes
 

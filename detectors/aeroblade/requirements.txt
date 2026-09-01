@@ -1,0 +1,31 @@
+# AEROBLADE (Ricker et al., CVPR 2024) -- isolated panel environment.
+#
+# NOT upstream's requirements.txt: that is a CUDA pip-freeze (nvidia-*, triton,
+# torch==2.1.2 which has no cp312 macOS arm64 wheel) and cannot install here.
+# This is the curated subset actually needed for the LPIPS reconstruction distance.
+#
+# Only the load-bearing versions are pinned; transformers / timm / tokenizers are
+# left to the resolver because pyiqa hard-pins transformers==4.37.2 and pinning it
+# a second time here just makes the resolution impossible.
+torch==2.5.1
+torchvision==0.20.1
+
+# diffusers 0.25.x is what the paper used, and `retrieve_latents` moved modules later.
+diffusers==0.25.1
+# <0.26 is required: diffusers 0.25.x imports huggingface_hub.cached_download,
+# which 0.26 removed.
+huggingface-hub==0.25.2
+
+# Unavoidable even though only LPIPS is used: aeroblade/distances.py imports pyiqa
+# at module scope.
+pyiqa==0.1.13
+lpips==0.1.4
+
+safetensors==0.4.5
+joblib==1.4.2
+lz4==4.3.3
+scipy==1.14.1
+pillow==11.0.0
+pandas==2.2.3
+# <2: the transformers/timm generation pyiqa pins predates the numpy 2 ABI break.
+numpy==1.26.4

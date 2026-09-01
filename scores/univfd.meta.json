@@ -1,0 +1,33 @@
+{
+  "detector": "univfd",
+  "score_semantics": "fc_logit",
+  "score_orientation": "higher_is_more_synthetic",
+  "upstream_repo": "https://github.com/WisconsinAIVision/UniversalFakeDetect",
+  "upstream_commit": "030495aea3300a8b54c0ec37ec7fe1dd7e63c619",
+  "weights": [
+    {
+      "path": "detectors/univfd/UniversalFakeDetect/pretrained_weights/fc_weights.pth",
+      "sha256": "477100745713bcc957beb2b40859536859b6483fd6301b3b9293151b194c7847"
+    },
+    {
+      "path": "/Users/brian/.cache/clip/ViT-L-14.pt",
+      "sha256": "b8cca3fd41ae0c99ba7e8951adf17d267cdb84cd88be6f7c2e0eca1737a03836"
+    }
+  ],
+  "manifest": {
+    "path": "manifest.csv",
+    "sha256": "7260fdc0a0053af1c1e2e30301533898b3af01db0dce25ff774af27ffb948026",
+    "rows": 288
+  },
+  "crop_policy": "crop200_align16",
+  "runtime": {
+    "device": "cpu",
+    "torch": "2.5.1",
+    "python": "3.12.14",
+    "platform": "macOS-26.5.1-arm64-arm-64bit"
+  },
+  "elapsed_s": 68.5,
+  "generated_at": "2026-09-01T15:06:34+00:00",
+  "arch": "CLIP:ViT-L/14",
+  "preprocessing": "shared 200x200 crop; uniform bicubic resize 200->224; CLIP Normalize"
+}

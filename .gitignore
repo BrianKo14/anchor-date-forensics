@@ -1,6 +1,18 @@
 # --- Project-specific ---
 AI-GenBench/
 
+# --- Detector panel (detectors/) ---
+# Upstream clones: fetched by detectors/README.md's setup, pinned by commit in panel.json.
+detectors/cnndetection/CNNDetection/
+detectors/univfd/UniversalFakeDetect/
+detectors/dmimagedetection/DMimageDetection/
+detectors/aeroblade/aeroblade/
+# Derived caches. reconstructions/ is AEROBLADE's AE round-trips, cache/ its joblib store.
+detectors/aeroblade/reconstructions/
+detectors/aeroblade/cache/
+# Score CSVs and their sidecars ARE tracked: they are small, and they are the provenance
+# record for each experiment. Only the crop cache (data/) and weights (*.pth) stay out.
+
 # --- AI ---
 CLAUDE.md
 

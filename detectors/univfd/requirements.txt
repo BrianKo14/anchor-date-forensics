@@ -1,0 +1,17 @@
+# UniversalFakeDetect / UnivFD (Ojha et al., CVPR 2023) -- isolated panel environment.
+# ftfy + regex are needed by the vendored models/clip/simple_tokenizer.py.
+# scipy/sklearn are deliberately absent: only models/ is imported, never validate.py
+# (which imports scipy.ndimage.filters, removed in scipy >= 1.15).
+torch==2.5.1
+torchvision==0.20.1
+ftfy==6.3.1
+regex==2024.11.6
+tqdm==4.67.1
+pillow==11.0.0
+pandas==2.2.3
+numpy==2.1.3
+
+# <81 on purpose: the vendored models/clip/clip.py does `from pkg_resources import
+# packaging`, and setuptools 81 removed pkg_resources. Pinning here keeps the upstream
+# clone unpatched.
+setuptools==80.9.0

@@ -1,0 +1,8 @@
+# CNNDetection (Wang et al., CVPR 2020) -- isolated panel environment.
+# torch is pinned below 2.6: 2.6 flipped torch.load to weights_only=True, which
+# breaks the repo's unguarded torch.load(ckpt)['model'].
+torch==2.5.1
+torchvision==0.20.1
+pillow==11.0.0
+pandas==2.2.3
+numpy==2.1.3

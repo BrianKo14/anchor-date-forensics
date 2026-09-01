@@ -1,0 +1,28 @@
+{
+  "detector": "cnndetection",
+  "score_semantics": "pre_sigmoid_logit",
+  "score_orientation": "higher_is_more_synthetic",
+  "upstream_repo": "https://github.com/PeterWang512/CNNDetection",
+  "upstream_commit": "ea0b5622365e3a9cd31d1b54b6b5971131a839ab",
+  "weights": [
+    {
+      "path": "detectors/cnndetection/CNNDetection/weights/blur_jpg_prob0.5.pth",
+      "sha256": "3533f3e58a3b82215f21197f2faf4e99b911ec42a4a6e2d7823e04d5f3fd245a"
+    }
+  ],
+  "manifest": {
+    "path": "manifest.csv",
+    "sha256": "7260fdc0a0053af1c1e2e30301533898b3af01db0dce25ff774af27ffb948026",
+    "rows": 288
+  },
+  "crop_policy": "crop200_align16",
+  "runtime": {
+    "device": "cpu",
+    "torch": "2.5.1",
+    "python": "3.12.14",
+    "platform": "macOS-26.5.1-arm64-arm-64bit"
+  },
+  "elapsed_s": 31.1,
+  "generated_at": "2026-09-01T15:05:19+00:00",
+  "preprocessing": "shared 200x200 crop; ToTensor + imagenet Normalize (demo.py)"
+}

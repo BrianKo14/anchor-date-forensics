@@ -1,0 +1,9 @@
+# DMimageDetection (Corvi et al., ICASSP 2023) -- isolated panel environment.
+# torch pinned below 2.6 for the same weights_only reason as cnndetection.
+# gdown is only used by fetch_weights.sh (the checkpoints live on Google Drive).
+torch==2.5.1
+torchvision==0.20.1
+gdown==5.2.0
+pillow==11.0.0
+pandas==2.2.3
+numpy==2.1.3
