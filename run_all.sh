@@ -2,7 +2,7 @@
 #
 # Score every image in manifest.csv with all four detectors.
 #
-#   ./run_all.sh                    # cpu (default), ~57 min for 288 images
+#   ./run_all.sh                    # cpu (default), ~4 h for 1224 images
 #   DEVICE=mps ./run_all.sh         # faster, but not bit-reproducible against cpu scores
 #   REBUILD_MANIFEST=1 ./run_all.sh # regenerate manifest.csv from the sample
 #

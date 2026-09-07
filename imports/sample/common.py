@@ -21,7 +21,9 @@ DATA_DIR = PROJECT_ROOT / "data"
 AUTHENTIC_DIR = DATA_DIR / "authentic"
 FAKES_DIR = DATA_DIR / "fakes"
 
-BENCHMARK_SPLIT = "validation"  # "validation" (36k ids) or "train" (144k); only the id list differs
+# "train" (144k ids) or "validation" (36k); only the id list differs. The train list is required
+# for RAISE at n>=200: the validation list pins just 64 RAISE ids, against 5,298 in train.
+BENCHMARK_SPLIT = "train"
 
 # The train/val partition *within* the sample -- a different axis from BENCHMARK_SPLIT above, and
 # recorded per row in the manifests' `split` column.

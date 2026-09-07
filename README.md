@@ -20,18 +20,25 @@ committed versions have them removed.
 
 ## The sample
 
-A miniature of AI-GenBench: **144 authentic + 144 fake** images, exactly 50/50, with 4 images from
-each of the 36 benchmark generators. It lands in `data/` (gitignored).
+A miniature of AI-GenBench: **612 authentic + 612 fake** images, exactly 50/50, with 17 images from
+each of the 36 benchmark generators and 204 from each of the three authentic sources. It lands in
+`data/` (gitignored).
 
-It is partitioned into a **train** and a **val** half, 72 + 72 each way, recorded per row in the
-manifests' `split` column. The partition is stratified — every generator contributes 2 images to
+612 rather than a round 600 because the two halves have to stay exactly 50/50 *and* the fake half
+uniform over 36 generators, so the shared total must be a multiple of 36 -- 612 is the smallest one
+that clears 200 per source.
+
+It is partitioned into a **train** and a **val** half, 306 + 306 each way, recorded per row in the
+manifests' `split` column. The partition is stratified — every generator contributes 8 or 9 images to
 each side, and the three authentic sources keep their proportions — because a per-family score model
 cannot be calibrated on a family that landed entirely on one side. Both halves go through the same
 `common.assign_splits`, seeded per stratum so that growing the sample leaves existing assignments
 untouched.
 
-Note that `split` (train/val) and the AI-GenBench split the ids are drawn from (`validation`, in the
-manifest filenames) are different axes; in code the latter is `common.BENCHMARK_SPLIT`.
+Note that `split` (train/val) and the AI-GenBench split the ids are drawn from (`train`, in the
+manifest filenames) are different axes; in code the latter is `common.BENCHMARK_SPLIT`. They collide
+in name only. The benchmark's `train` list is what makes 204 RAISE images possible at all: it pins
+5,298 RAISE ids, against just 64 in the `validation` list.
 
 Importing:
 
@@ -42,7 +49,7 @@ Importing:
 
 Both are re-runnable and skip whatever is already on disk, so a second run costs nothing. The
 authentic half is fetched image by image (no origin archives); the fake half reads the benchmark's
-parquet directly, downloading only the row groups it draws from (~51 MB, against a 7 GB split).
+parquet directly, downloading only the row groups it draws from (~202 MB, against a 30 GB split).
 
 Then explore it with `sample.ipynb`, with the repo root as the working directory:
 
@@ -58,9 +65,9 @@ Then explore it with `sample.ipynb`, with the repo root as the working directory
 - **Normalized to JPEG q95**, i.e. the benchmark's `make_jpeg_dataset = True` variant. The shipped
   default is `False`, which leaves fakes as native PNG/JPEG/WEBP against near-all-JPEG reals — a
   format difference that separates the classes on its own.
-- **Small and narrow**: 144 + 144, `validation` split only, drawn from one of 15 shards.
+- **Small and narrow**: 612 + 612, `train` split only, drawn from one of 57 fake shards.
 - **Not byte-reproducible**: LAION link rot means a rerun picks different images. The importer
-  oversamples a shuffled filelist to reach its 68 LAION images, so how many URLs it walks varies.
+  oversamples a shuffled filelist to reach its 204 LAION images, so how many URLs it walks varies.
 - **No ImageNet**, though the AI-GenBench README lists it — its shipped file-id lists contain none.
 - **RAISE needs `RAISE_urls.csv`** fetched by hand from
   [loki.disi.unitn.it/RAISE](http://loki.disi.unitn.it/RAISE/confirm.php?package=all); the step is
@@ -77,7 +84,7 @@ Four published detectors -- CNNDetection, UniversalFakeDetect, DMimageDetection 
 checkpoints) and AEROBLADE -- each in its own virtualenv, producing raw pre-threshold scores.
 
 ```sh
-./run_all.sh                # score every image in manifest.csv (~57 min on cpu)
+./run_all.sh                # score every image in manifest.csv (~4 h on cpu)
 DEVICE=mps ./run_all.sh     # faster; cpu is the default and is bit-reproducible
 ```
 

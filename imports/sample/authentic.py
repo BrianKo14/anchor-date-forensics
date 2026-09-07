@@ -28,8 +28,11 @@ from common import (
 )
 from imaging import decode_and_validate, prepare_image
 
-N_PER_SOURCE = 68  # 68 COCO + 68 LAION + N_RAISE = 144, matching the fake half
-N_RAISE = 8        # RAISE TIFFs are ~20 MB each, so sample far fewer
+# 204 x 3 sources = 612, matching the fake half's 17 x 36 generators. 204 rather than a round 200
+# because the two halves have to stay exactly 50/50 *and* the fake half has to stay uniform over 36
+# generators, so the shared total must be a multiple of 36; 612 is the smallest one above 200/source.
+N_PER_SOURCE = 204
+N_RAISE = 204      # RAISE TIFFs are ~20 MB each, so this alone is ~4.5 GB of fetching
 SEED = 1234
 
 COCO_DIRS = {"COCO2017_train": "train2017", "COCO2017_val": "val2017"}

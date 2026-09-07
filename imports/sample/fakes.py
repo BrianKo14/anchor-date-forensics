@@ -37,18 +37,24 @@ from common import (
 from imaging import check_parity, prepare_image
 
 REPO = "lrzpellegrini/AI-GenBench-fake_part"
-SHARD = "validation-00000-of-00015.parquet"  # any one shard holds all 36 generators
+SHARD_GLOB = f"data/{BENCHMARK_SPLIT}-*.parquet"  # any one shard holds all 36 generators
 
-N_PER_GENERATOR = 4  # 4 x 36 generators = 144, matching the authentic half
-MAX_ROW_GROUPS = 8   # guard: each row group is ~17 MB, so cap the worst case at ~136 MB
-                     # (4 per generator takes 5 groups, ~86 MB -- the cap has headroom)
+N_PER_GENERATOR = 17  # 17 x 36 generators = 612, matching the authentic half's 204 x 3 sources
+MAX_ROW_GROUPS = 16   # guard: each row group is ~20 MB, so cap the worst case at ~320 MB
+                      # (17 per generator takes 10 groups, ~202 MB -- the cap has headroom)
 
 INDEX_COLUMNS = ["generator", "file_id", "width", "height", "origin_dataset", "description"]
 
 
 def open_shard():
+    """The split's first shard. Resolved by listing rather than named, because the shard count is
+    part of every filename and differs per split (15 for validation, 57 for train)."""
     filesystem = HfFileSystem()
-    return pq.ParquetFile(filesystem.open(f"datasets/{REPO}/data/{SHARD}", "rb"))
+    shards = sorted(filesystem.glob(f"datasets/{REPO}/{SHARD_GLOB}"))
+    if not shards:
+        raise SystemExit(f"no {BENCHMARK_SPLIT} shards in {REPO}")
+    print(f"{len(shards)} {BENCHMARK_SPLIT} shards; reading {shards[0].split('/')[-1]}")
+    return pq.ParquetFile(filesystem.open(shards[0], "rb"))
 
 
 def build_index(parquet, verbose=True):

@@ -5,8 +5,8 @@
 Why a shared cache rather than each detector's own preprocessing:
 
   * The sample's short sides run 200 -> 3264. UniversalFakeDetect's upstream CenterCrop(224)
-    would zero-pad 66 fakes and only 4 reals, making padding a class cue -- precisely the kind
-    of confound this project exists to avoid.
+    would zero-pad 277 fakes and only 19 reals, making padding a class cue -- precisely the
+    kind of confound this project exists to avoid.
   * DMimageDetection's res50stride1 does not downsample in its stem, so a 4928x3264 RAISE scan
     produces a ~4 GB activation. Three Stable Diffusion VAEs on the same image fare no better.
   * A likelihood ratio built on a panel needs every member to have seen the *same* pixels.
