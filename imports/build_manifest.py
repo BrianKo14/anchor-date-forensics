@@ -7,11 +7,21 @@ script takes filters and an output path rather than hardcoding either.
 
 The emitted schema is the panel's input contract:
 
-    image_id, path, label, generator_family, release_date, generator, crop_path
+    image_id, path, label, generator_family, release_date, generator, crop_path,
+    source_width, source_height, crop_top, crop_left, crop_height, crop_width
 
 `path` points at the imported JPEG, `crop_path` at the preprocessed crop the detectors
 actually read (see preprocess_crop_cache.py). Both are repo-root-relative, matching the
 convention the importers already use.
+
+The last six columns are the crop's provenance: the image's native dimensions and the exact
+box taken out of it. They are written here rather than by the cache builder because the
+manifest is what every downstream artifact joins on -- the score files, master_scores.csv,
+and eventually the attestation emitter's panel manifest. preprocess_crop_cache.py *reads*
+these coordinates rather than recomputing them, so the recorded box is by construction the
+box that was cut: a crop whose location or native size cannot be recovered later is a hole
+in the audit trail, and RAISE is where it would hurt most (a 4928x3264 scan reduced to one
+200x200 patch with no record of which patch).
 """
 
 import argparse
@@ -30,6 +40,12 @@ MANIFEST_COLUMNS = [
     "release_date",
     "generator",
     "crop_path",
+    "source_width",
+    "source_height",
+    "crop_top",
+    "crop_left",
+    "crop_height",
+    "crop_width",
 ]
 
 AUTHENTIC_FAMILY = "authentic"
@@ -111,6 +127,28 @@ def crop_path(file_id, policy_id):
     return f"data/preprocessed/{policy_id}/{file_id.replace('/', '_')}.png"
 
 
+def crop_box(width, height, size, align):
+    """Centre crop of `size`, origin snapped down to a multiple of `align`.
+
+    Returns (top, left, height, width) -- torchvision's crop-parameter order, which is also
+    what AI-GenBench's RandomCropIfLarge.get_crop_params emits, so the two are directly
+    comparable if this policy is ever swapped for that transform. Note the differences that
+    would come with such a swap: RandomCropIfLarge crops to min(side, size) per axis, i.e. it
+    leaves an under-size axis alone rather than raising, and it does not align the origin.
+    Neither matters for the current sample (imaging.decode_and_validate already rejects
+    anything under common.IMAGE_MIN_SIZE == 200, so every crop here is a full 200x200), but
+    the alignment does: see preprocess_crop_cache.py on why the origin is snapped to 16.
+
+    Nothing is ever upscaled or resampled -- this policy only ever removes pixels, which is
+    what keeps RAISE's 4928x3264 scans out of the interpolation that a resize would impose.
+    """
+    if width < size or height < size:
+        raise ValueError(f"image is {width}x{height}, smaller than the {size}x{size} crop")
+    left = ((width - size) // 2 // align) * align
+    top = ((height - size) // 2 // align) * align
+    return top, left, size, size
+
+
 def family_of(row):
     generator = (row["generator"] or "").strip()
     if row["label"] == common.REAL_LABEL:
@@ -118,8 +156,9 @@ def family_of(row):
     return GENERATOR_FAMILIES[generator]
 
 
-def build(policy_id, split=None, origin_dataset=None, label=None):
+def build(size, align, split=None, origin_dataset=None, label=None):
     """The sample as a panel manifest DataFrame, filtered as requested."""
+    policy_id = crop_policy_id(size, align)
     sample = common.load_sample()
 
     if split is not None:
@@ -146,6 +185,22 @@ def build(policy_id, split=None, origin_dataset=None, label=None):
     manifest["image_id"] = manifest["file_id"]
     manifest["generator_family"] = manifest.apply(family_of, axis=1)
     manifest["crop_path"] = [crop_path(fid, policy_id) for fid in manifest["file_id"]]
+
+    # Crop provenance. The importers recorded each image's native size; the box is derived
+    # from it here so that the manifest, not the cache builder, is the single place the crop
+    # geometry is decided. An under-size image is fatal and names itself -- silently emitting
+    # a short crop would hand the panel a differently-shaped input with no trace in the CSV.
+    boxes = []
+    for row in manifest.itertuples():
+        try:
+            boxes.append(crop_box(int(row.width), int(row.height), size, align))
+        except ValueError as error:
+            raise SystemExit(f"{row.file_id}: {error}")
+    manifest["source_width"] = manifest["width"].astype(int)
+    manifest["source_height"] = manifest["height"].astype(int)
+    for column, values in zip(("crop_top", "crop_left", "crop_height", "crop_width"), zip(*boxes)):
+        manifest[column] = list(values)
+
     if "release_date" not in manifest.columns:
         manifest["release_date"] = ""
     manifest["release_date"] = manifest["release_date"].fillna("")
@@ -176,15 +231,20 @@ def main():
     if not common.sample_exists():
         raise SystemExit("sample not imported; run imports/sample/authentic.py and fakes.py first")
 
-    policy_id = crop_policy_id(args.crop_size, args.crop_align)
-    manifest = build(policy_id, split=args.split, origin_dataset=args.origin_dataset, label=args.label)
+    manifest = build(
+        args.crop_size,
+        args.crop_align,
+        split=args.split,
+        origin_dataset=args.origin_dataset,
+        label=args.label,
+    )
 
     args.out.parent.mkdir(parents=True, exist_ok=True)
     manifest.to_csv(args.out, index=False)
 
     counts = manifest["generator_family"].value_counts()
     print(f"wrote {len(manifest)} rows -> {args.out}")
-    print(f"crop policy: {policy_id}")
+    print(f"crop policy: {crop_policy_id(args.crop_size, args.crop_align)}")
     print(f"labels: {dict(manifest['label'].value_counts())}")
     print("families: " + ", ".join(f"{fam}={n}" for fam, n in counts.items()))
 

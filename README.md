@@ -77,6 +77,11 @@ Then explore it with `sample.ipynb`, with the repo root as the working directory
   `crop200_align16` cache. This avoids padding artifacts from `CenterCrop(224)` on small images,
   avoids huge full-resolution activations, and keeps panel scores comparable. Crop origins are
   aligned to 16, outputs are lossless PNG, and CLIP ViT-L/14 is uniformly upscaled 200->224.
+- **Nothing is ever resized on the way in.** The crop policy only removes pixels, so RAISE's
+  2000x3008 -> 4928x3264 scans reach the panel as native pixels rather than as an interpolated
+  reduction. Each crop's box (`crop_top`, `crop_left`, `crop_height`, `crop_width`) and the
+  image's native `source_width`/`source_height` are recorded per row in `manifest.csv`, so which
+  patch of a scan was scored, and how much of the frame it represents, stays auditable.
 
 ## Detector panel
 
@@ -114,7 +119,8 @@ preprocess_crop_cache.py   the crop cache the panel reads
 sample.ipynb       read the sample
 data/              the sample itself (gitignored)
 detectors/         the detector panel: one venv, clone and run_score.py each
-manifest.csv       image_id, path, label, generator_family, release_date, generator, crop_path
+manifest.csv       image_id, path, label, generator_family, release_date, generator, crop_path,
+                   source_width, source_height, crop_top, crop_left, crop_height, crop_width
 run_all.sh         score manifest.csv with all four detectors
 scores/            one <detector>.csv + .meta.json each, and master_scores.csv
 merge_scores.ipynb join the scores and look at them
