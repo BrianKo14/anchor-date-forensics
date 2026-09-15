@@ -17,7 +17,13 @@ PROJECT_ROOT = Path(__file__).resolve().parents[2]
 os.environ.setdefault("HF_HOME", str(PROJECT_ROOT / ".cache" / "huggingface"))
 
 AIGENBENCH_DIR = PROJECT_ROOT / "AI-GenBench"
-DATA_DIR = PROJECT_ROOT / "data"
+
+# Defaults to the in-repo `data/` the 612-image sample lives in, so every existing script keeps
+# working untouched on either machine. AIGENBENCH_DATA_ROOT lets a run point at a data root that
+# lives outside the repo instead -- e.g. /data/aigenbench on the lab server, where a full-scale
+# dataset would be too large for the repo and has to sit on /data (110G free on / vs. 1.5T on
+# /data; see CLAUDE.md's "Remote access & compute resources").
+DATA_DIR = Path(os.environ.get("AIGENBENCH_DATA_ROOT") or PROJECT_ROOT / "data")
 AUTHENTIC_DIR = DATA_DIR / "authentic"
 FAKES_DIR = DATA_DIR / "fakes"
 

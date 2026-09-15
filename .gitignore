@@ -96,6 +96,8 @@ datasets/
 credentials.json
 service_account.json
 token.json
+ssh_config
+config.ssh
 
 # --- Editors / IDEs ---
 .vscode/
