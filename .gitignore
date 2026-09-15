@@ -1,0 +1,25 @@
+# --- OS ---
+.DS_Store
+.DS_Store?
+._*
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+
+# --- Virtual environments ---
+.venv/
+venv/
+
+# --- Downloader run state (SQLite job DB + logs); rebuilt by `pipeline.py --reconcile` ---
+var/
+
+# --- Secrets ---
+.env
+.env.*
+ssh_config
+config.ssh
+
+# --- Editors ---
+.vscode/
+.idea/

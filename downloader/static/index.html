@@ -1,0 +1,262 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI-GenBench download</title>
+<style>
+  :root {
+    --bg: #fbfbfa; --panel: #fff; --ink: #1a1a18; --muted: #6b6b66;
+    --line: #e4e4e0; --accent: #2f6f4f; --warn: #9a6b1f; --bad: #9a3b2f;
+    --bar: #e8e8e4;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #16171a; --panel: #1d1f23; --ink: #e9e9e6; --muted: #9a9a94;
+      --line: #2c2f34; --accent: #6fb98f; --warn: #d6a44c; --bad: #d97a6c;
+      --bar: #2a2d32;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 24px; background: var(--bg); color: var(--ink);
+    font: 14px/1.5 ui-sans-serif, -apple-system, "Segoe UI", system-ui, sans-serif;
+  }
+  .wrap { max-width: 1100px; margin: 0 auto; }
+  h1 { font-size: 19px; margin: 0 0 2px; font-weight: 650; letter-spacing: -0.01em; }
+  .sub { color: var(--muted); font-size: 12.5px; margin-bottom: 20px; }
+  .sub code { background: var(--bar); padding: 1px 5px; border-radius: 4px; font-size: 12px; }
+  .panel {
+    background: var(--panel); border: 1px solid var(--line); border-radius: 10px;
+    padding: 16px 18px; margin-bottom: 14px;
+  }
+  .row { display: flex; gap: 20px; flex-wrap: wrap; align-items: center; }
+  .stat { min-width: 110px; }
+  .stat .k { color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: .05em; }
+  .stat .v { font-size: 17px; font-variant-numeric: tabular-nums; font-weight: 600; margin-top: 1px; }
+  .src { border-top: 1px solid var(--line); padding: 13px 0; }
+  .src:first-of-type { border-top: 0; }
+  .src-head { display: flex; align-items: baseline; gap: 10px; margin-bottom: 7px; flex-wrap: wrap; }
+  .name { font-weight: 650; font-size: 14.5px; min-width: 56px; }
+  .nums { color: var(--muted); font-size: 12.5px; font-variant-numeric: tabular-nums; }
+  .nums b { color: var(--ink); font-weight: 600; }
+  .track { height: 7px; background: var(--bar); border-radius: 4px; overflow: hidden; }
+  .fill { height: 100%; background: var(--accent); transition: width .4s ease; }
+  .fill.err { background: var(--bad); }
+  .ctl { display: flex; gap: 7px; align-items: center; margin-left: auto; }
+  button {
+    font: inherit; font-size: 12.5px; padding: 4px 11px; border-radius: 6px;
+    border: 1px solid var(--line); background: var(--panel); color: var(--ink); cursor: pointer;
+  }
+  button:hover { border-color: var(--muted); }
+  button.on { background: var(--accent); color: #fff; border-color: var(--accent); }
+  button.danger { color: var(--bad); }
+  input[type=range] { width: 150px; accent-color: var(--accent); }
+  input[type=number] {
+    font: inherit; width: 58px; padding: 3px 6px; border-radius: 5px;
+    border: 1px solid var(--line); background: var(--bg); color: var(--ink);
+  }
+  .pill {
+    font-size: 11px; padding: 2px 8px; border-radius: 20px; border: 1px solid var(--line);
+    color: var(--muted);
+  }
+  .pill.normal { color: var(--accent); border-color: var(--accent); }
+  .pill.throttled { color: var(--warn); border-color: var(--warn); }
+  .pill.paused { color: var(--bad); border-color: var(--bad); }
+  .fails { color: var(--muted); font-size: 11.5px; margin-top: 5px; font-variant-numeric: tabular-nums; }
+  .fails span { margin-right: 12px; }
+  .log { max-height: 220px; overflow-y: auto; font-size: 12px; font-family: ui-monospace, monospace; }
+  .log div { padding: 1.5px 0; color: var(--muted); }
+  .log .error { color: var(--bad); } .log .warn { color: var(--warn); }
+  .log .src-tag { color: var(--ink); display: inline-block; min-width: 72px; }
+  h2 { font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted);
+       margin: 0 0 10px; font-weight: 600; }
+  .offline { color: var(--bad); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>AI-GenBench download</h1>
+  <div class="sub">
+    180,000 real + 180,000 fake &rarr; <code id="root">&hellip;</code>
+    &middot; <span id="conn"></span>
+  </div>
+
+  <div class="panel">
+    <div class="row">
+      <div class="stat"><div class="k">Elapsed</div><div class="v" id="elapsed">&mdash;</div></div>
+      <div class="stat"><div class="k">Throughput</div><div class="v" id="rate">&mdash;</div></div>
+      <div class="stat"><div class="k">Disk free</div><div class="v" id="disk">&mdash;</div></div>
+      <div class="stat"><div class="k">Load</div><div class="v" id="load">&mdash;</div></div>
+      <div class="stat"><div class="k">Governor</div><div class="v"><span class="pill" id="gov">&mdash;</span></div></div>
+      <div class="ctl">
+        <button id="pause">Pause all</button>
+        <button id="retry">Retry failed</button>
+      </div>
+    </div>
+    <div class="row" style="margin-top:14px; border-top:1px solid var(--line); padding-top:13px;">
+      <label class="nums">Rate limit
+        <input type="range" id="rateSlider" min="1" max="40" step="1">
+        <b id="rateLabel">&mdash;</b>
+      </label>
+      <label class="nums" style="margin-left:14px;">CPU workers
+        <input type="number" id="cpu" min="1" max="32">
+      </label>
+    </div>
+  </div>
+
+  <div class="panel" id="courtesy" style="display:none; border-color:var(--warn)">
+    <h2 style="color:var(--warn)">Held by a shared-machine courtesy pause</h2>
+    <div class="nums">
+      Someone on <b>sapucay</b> asked this job to stand down by creating
+      <code id="pauseFile"></code>.<br>
+      Nothing is lost — partial downloads are kept and it resumes the moment that file is removed:
+      <code>rm <span id="pauseFile2"></span></code>
+    </div>
+  </div>
+
+  <div class="panel" id="sources"></div>
+
+  <div class="panel">
+    <h2>Recent events</h2>
+    <div class="log" id="log"></div>
+  </div>
+</div>
+
+<script>
+const fmtBytes = n => {
+  if (!n) return "0 B";
+  const u = ["B","KB","MB","GB","TB"];
+  let i = 0; while (n >= 1024 && i < u.length - 1) { n /= 1024; i++; }
+  return n.toFixed(i ? 1 : 0) + " " + u[i];
+};
+const fmtDur = s => {
+  if (s === null || s === undefined) return "—";
+  if (s < 60) return Math.round(s) + "s";
+  if (s < 3600) return Math.floor(s / 60) + "m " + Math.round(s % 60) + "s";
+  const h = Math.floor(s / 3600);
+  return h + "h " + Math.round((s % 3600) / 60) + "m";
+};
+const fmtNum = n => (n ?? 0).toLocaleString();
+
+async function post(path, body) {
+  await fetch(path, {
+    method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify(body)
+  });
+  refresh();
+}
+
+let dragging = false;
+document.getElementById("rateSlider").addEventListener("input", e => {
+  dragging = true;
+  document.getElementById("rateLabel").textContent = e.target.value + " MB/s";
+});
+document.getElementById("rateSlider").addEventListener("change", e => {
+  dragging = false;
+  post("/api/control", {rate_bytes: Number(e.target.value) * 1000000});
+});
+document.getElementById("cpu").addEventListener("change", e =>
+  post("/api/control", {cpu_workers: Number(e.target.value)}));
+document.getElementById("pause").addEventListener("click", e =>
+  post("/api/control", {paused: e.target.classList.contains("on") ? "0" : "1"}));
+document.getElementById("retry").addEventListener("click", () =>
+  post("/api/action", {action: "retry-failed"}));
+
+function renderSources(data) {
+  const box = document.getElementById("sources");
+  box.innerHTML = "";
+  for (const s of data.sources) {
+    const pct = s.total ? Math.min(100, 100 * s.done / s.total) : 0;
+    const el = document.createElement("div");
+    el.className = "src";
+    const cap = s.hard_cap ? ` (capped at ${s.hard_cap})` : "";
+    const eff = s.effective_concurrency !== s.concurrency
+      ? ` → ${s.effective_concurrency} by governor` : "";
+    el.innerHTML = `
+      <div class="src-head">
+        <span class="name">${s.name}</span>
+        <span class="nums">
+          <b>${fmtNum(s.done)}</b> / ${fmtNum(s.total)}
+          &middot; ${pct.toFixed(1)}%
+          &middot; ${fmtBytes(s.bytes)}
+          &middot; ${fmtBytes(s.bytes_per_s)}/s
+          &middot; ETA ${fmtDur(s.eta_seconds)}
+          ${s.failed ? `&middot; <span style="color:var(--bad)">${fmtNum(s.failed)} failed</span>` : ""}
+          ${s.active ? `&middot; ${s.active} in flight` : ""}
+        </span>
+        <span class="ctl">
+          <span class="nums">conc ${s.concurrency}${cap}${eff}</span>
+          <input type="number" min="1" max="32" value="${s.concurrency}"
+                 onchange="post('/api/control', {'concurrency:${s.name}': Number(this.value)})">
+          <button class="${s.paused ? "on" : ""}"
+                  onclick="post('/api/control', {'paused:${s.name}': '${s.paused ? "0" : "1"}'})">
+            ${s.paused ? "Paused" : "Pause"}
+          </button>
+        </span>
+      </div>
+      <div class="track"><div class="fill" style="width:${pct}%"></div></div>
+      ${s.failures.length
+        ? `<div class="fails">${s.failures.map(f =>
+            `<span>${f[0]}: <b>${f[1]}</b></span>`).join("")}</div>`
+        : ""}
+    `;
+    box.appendChild(el);
+  }
+}
+
+function renderLog(events) {
+  document.getElementById("log").innerHTML = events.map(e =>
+    `<div class="${e.level}"><span class="src-tag">${e.source || "-"}</span>${
+      e.msg.replace(/</g, "&lt;")}</div>`).join("");
+}
+
+async function refresh() {
+  let data;
+  try {
+    data = await (await fetch("/api/status")).json();
+    document.getElementById("conn").textContent = "live";
+    document.getElementById("conn").className = "";
+  } catch {
+    document.getElementById("conn").textContent = "disconnected — is the job still running?";
+    document.getElementById("conn").className = "offline";
+    return;
+  }
+
+  document.getElementById("root").textContent = data.data_root;
+  document.getElementById("elapsed").textContent = fmtDur(data.elapsed);
+  document.getElementById("rate").textContent = fmtBytes(data.total_bytes_per_s) + "/s";
+  document.getElementById("disk").textContent = fmtBytes(data.disk.free);
+  document.getElementById("load").textContent =
+    data.governor.load.toFixed(1) + " / " + data.governor.nproc;
+
+  const gov = document.getElementById("gov");
+  gov.textContent = data.governor.mode;
+  gov.className = "pill " + data.governor.mode;
+  gov.title = `throttle above ${data.governor.throttle_at}, pause above ${data.governor.pause_at}`;
+
+  document.getElementById("courtesy").style.display = data.courtesy_paused ? "" : "none";
+  document.getElementById("pauseFile").textContent = data.pause_file;
+  document.getElementById("pauseFile2").textContent = data.pause_file;
+
+  const pause = document.getElementById("pause");
+  pause.classList.toggle("on", data.paused);
+  pause.textContent = data.paused ? "Paused — resume" : "Pause all";
+
+  if (!dragging) {
+    const mb = Math.max(1, Math.round(data.rate_bytes / 1000000));
+    document.getElementById("rateSlider").value = mb;
+    document.getElementById("rateLabel").textContent = mb + " MB/s";
+  }
+  if (document.activeElement !== document.getElementById("cpu")) {
+    document.getElementById("cpu").value = data.cpu_workers;
+  }
+
+  renderSources(data);
+  renderLog(data.events);
+}
+
+refresh();
+setInterval(refresh, 2000);
+</script>
+</body>
+</html>
