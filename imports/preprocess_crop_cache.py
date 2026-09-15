@@ -40,6 +40,7 @@ import argparse
 import os
 import sys
 import time
+from concurrent.futures import ProcessPoolExecutor
 from pathlib import Path
 
 import pandas as pd
@@ -115,28 +116,60 @@ def crop_one(source, dest, source_width, source_height, crop_top, crop_left, cro
     return size
 
 
-def build_cache(manifest, force=False):
-    written = skipped = 0
-    for row in manifest.itertuples():
-        source = common.resolve_source_path(row.path)
-        dest = common.PROJECT_ROOT / row.crop_path
-        top, left = int(row.crop_top), int(row.crop_left)
-        height, width = int(row.crop_height), int(row.crop_width)
+def _crop_row(args):
+    """Picklable per-row worker for the process pool: crop one row, catching its own errors.
 
+    Returns (image_id, error_message_or_None) rather than raising, since a pool worker's
+    exception would otherwise just abort that one task silently -- the caller decides what to do
+    with a batch of (id, error) results once every row has had a chance to run.
+    """
+    image_id, path, crop_path, source_width, source_height, top, left, height, width = args
+    source = common.resolve_source_path(path)
+    dest = common.PROJECT_ROOT / crop_path
+    try:
+        crop_one(source, dest, source_width, source_height, top, left, height, width)
+    except FileNotFoundError:
+        return image_id, f"source image missing: {source}"
+    except ManifestMismatch as error:
+        return image_id, str(error)
+    return image_id, None
+
+
+def build_cache(manifest, force=False, workers=1):
+    """Crop every row not already cached. `workers` > 1 fans the work out across processes.
+
+    Sequential and parallel paths share one function (_crop_row) rather than duplicating the
+    crop logic per branch -- the only difference is whether `map` runs in this process or a pool.
+    """
+    skipped = 0
+    todo = []
+    for row in manifest.itertuples():
+        dest = common.PROJECT_ROOT / row.crop_path
+        height, width = int(row.crop_height), int(row.crop_width)
         if not force and is_cached(dest, (width, height)):
             skipped += 1
             continue
+        todo.append((row.image_id, row.path, row.crop_path, int(row.source_width),
+                     int(row.source_height), int(row.crop_top), int(row.crop_left), height, width))
 
-        try:
-            crop_one(source, dest, int(row.source_width), int(row.source_height),
-                     top, left, height, width)
-        except FileNotFoundError:
-            raise SystemExit(f"source image missing: {source}\nre-run the sample importers.")
-        except ManifestMismatch as error:
-            raise SystemExit(f"{row.image_id}: {error}")
-        written += 1
+    errors = []
+    if workers > 1:
+        with ProcessPoolExecutor(max_workers=workers) as pool:
+            for image_id, error in pool.map(_crop_row, todo, chunksize=32):
+                if error is not None:
+                    errors.append((image_id, error))
+    else:
+        for args in todo:
+            image_id, error = _crop_row(args)
+            if error is not None:
+                errors.append((image_id, error))
 
-    return written, skipped
+    if errors:
+        lines = "\n".join(f"  {image_id}: {error}" for image_id, error in errors[:10])
+        more = f"\n  ... and {len(errors) - 10} more" if len(errors) > 10 else ""
+        raise SystemExit(f"{len(errors)} row(s) failed:\n{lines}{more}")
+
+    return len(todo), skipped
 
 
 def _origin_of(row):
@@ -210,6 +243,8 @@ def main():
     parser.add_argument("--force", action="store_true", help="rewrite crops that are already cached")
     parser.add_argument("--benchmark", action="store_true",
                          help="time crop_one() per row, grouped by origin, instead of building the cache")
+    parser.add_argument("--workers", type=int, default=1,
+                         help="parallel worker processes (default: 1, sequential)")
     args = parser.parse_args()
 
     # No --size/--align here: the geometry comes from the manifest. They used to be accepted,
@@ -227,7 +262,7 @@ def main():
         benchmark_cache(manifest, force=args.force)
         return
 
-    written, skipped = build_cache(manifest, force=args.force)
+    written, skipped = build_cache(manifest, force=args.force, workers=args.workers)
 
     sizes = sorted({(int(w), int(h)) for w, h in zip(manifest["crop_width"], manifest["crop_height"])})
     out_dirs = sorted({str(Path(p).parent) for p in manifest["crop_path"]})

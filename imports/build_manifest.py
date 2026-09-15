@@ -169,10 +169,10 @@ def family_of(row):
     return GENERATOR_FAMILIES[generator]
 
 
-def build(size, align, split=None, origin_dataset=None, label=None):
+def build(size, align, split=None, origin_dataset=None, label=None, benchmark_splits=None):
     """The sample as a panel manifest DataFrame, filtered as requested."""
     policy_id = crop_policy_id(size, align)
-    sample = common.load_sample()
+    sample = common.load_sample(splits=benchmark_splits)
 
     if split is not None:
         sample = sample[sample["split"] == split]
@@ -239,6 +239,10 @@ def main():
     parser.add_argument("--split", choices=[common.TRAIN_SPLIT, common.VAL_SPLIT], default=None)
     parser.add_argument("--origin-dataset", default=None, help="e.g. RAISE, COCO2017, LAION-400M")
     parser.add_argument("--label", type=int, choices=[common.REAL_LABEL, common.FAKE_LABEL], default=None)
+    parser.add_argument("--include-validation", action="store_true",
+                         help="also load AI-GenBench's validation partition, not just "
+                              "common.BENCHMARK_SPLIT (train) -- only meaningful once both "
+                              "partitions have been imported, e.g. the full-dataset build")
     args = parser.parse_args()
 
     if not common.sample_exists():
@@ -250,6 +254,7 @@ def main():
         split=args.split,
         origin_dataset=args.origin_dataset,
         label=args.label,
+        benchmark_splits=("train", "validation") if args.include_validation else None,
     )
 
     args.out.parent.mkdir(parents=True, exist_ok=True)

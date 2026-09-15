@@ -141,16 +141,23 @@ def sample_exists():
     ).exists()
 
 
-def load_sample():
+def load_sample(splits=None):
     """Both halves as one DataFrame, authentic (label 0) first.
 
     Carries the `split` column the importers wrote, i.e. the train/val partition.
+
+    `splits` selects which AI-GenBench benchmark partition(s) to read (default: just
+    BENCHMARK_SPLIT -- the one the in-repo sample importers draw from). The full-dataset build
+    has both partitions fully downloaded as separate manifests; passing `("train", "validation")`
+    loads and concatenates both.
     """
     import pandas as pd
 
-    authentic = read_manifest(AUTHENTIC_DIR, f"authentic_{BENCHMARK_SPLIT}")
-    fakes = read_manifest(FAKES_DIR, f"fakes_{BENCHMARK_SPLIT}")
-    return pd.concat([authentic, fakes], ignore_index=True)
+    frames = []
+    for split in splits or (BENCHMARK_SPLIT,):
+        frames.append(read_manifest(AUTHENTIC_DIR, f"authentic_{split}"))
+        frames.append(read_manifest(FAKES_DIR, f"fakes_{split}"))
+    return pd.concat(frames, ignore_index=True)
 
 
 def disk_mb(out_dir):
