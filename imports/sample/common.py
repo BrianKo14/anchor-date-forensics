@@ -98,6 +98,21 @@ def image_path(out_dir, file_id):
     return out_dir / "images" / (file_id.replace("/", "_") + ".jpg")
 
 
+def resolve_source_path(rel):
+    """A manifest `path` value, resolved to wherever the image actually lives.
+
+    Two conventions exist: the in-repo sample importers write PROJECT_ROOT-relative paths (e.g.
+    "data/authentic/images/x.jpg"), correct when DATA_DIR sits inside PROJECT_ROOT (the in-repo
+    default). The full-dataset build instead writes DATA_DIR-relative paths (e.g.
+    "authentic/images/x.jpg"), correct when DATA_DIR is external (/data/aigenbench). Try DATA_DIR
+    first -- the common case once AIGENBENCH_DATA_ROOT is set -- and fall back to PROJECT_ROOT
+    rather than picking one and breaking the other.
+    """
+    rel = Path(rel)
+    candidate = DATA_DIR / rel
+    return candidate if candidate.exists() else PROJECT_ROOT / rel
+
+
 def write_manifest(rows, out_dir, stem):
     """Write rows as both parquet (for downstream use) and jsonl (so diffs stay readable)."""
     import pandas as pd

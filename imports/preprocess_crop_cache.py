@@ -37,7 +37,9 @@ apart, and every crop coordinate in the CSV is then describing a different image
 """
 
 import argparse
+import os
 import sys
+import time
 from pathlib import Path
 
 import pandas as pd
@@ -72,10 +74,51 @@ def is_cached(path, size):
         return False
 
 
+class ManifestMismatch(Exception):
+    """The manifest's recorded geometry no longer matches the image on disk."""
+
+
+def crop_one(source, dest, source_width, source_height, crop_top, crop_left, crop_height, crop_width):
+    """Cut one manifest row's crop box out of `source` and write it atomically to `dest`.
+
+    Raises FileNotFoundError if `source` is missing, ManifestMismatch if the on-disk image's size
+    disagrees with source_width/source_height or the crop box doesn't fit -- both mean the
+    manifest and the images on disk have drifted apart. Afterward `dest` either doesn't exist or
+    is a complete, valid PNG -- never a partial one: the crop is saved to a temp file in the same
+    directory and `os.replace`d into place, so a killed process cannot leave behind a file a later
+    resume check mistakes for done. Returns the number of bytes written.
+    """
+    if not source.exists():
+        raise FileNotFoundError(source)
+
+    with Image.open(source) as image:
+        if image.size != (source_width, source_height):
+            raise ManifestMismatch(
+                f"manifest records {source_width}x{source_height} but {source} is "
+                f"{image.width}x{image.height}; the manifest is stale, rebuild it with "
+                f"imports/build_manifest.py"
+            )
+        if crop_left + crop_width > image.width or crop_top + crop_height > image.height:
+            raise ManifestMismatch(
+                f"crop box (top={crop_top}, left={crop_left}, height={crop_height}, "
+                f"width={crop_width}) does not fit in {image.width}x{image.height}"
+            )
+        cropped = image.convert("RGB").crop(
+            (crop_left, crop_top, crop_left + crop_width, crop_top + crop_height)
+        )
+
+    dest.parent.mkdir(parents=True, exist_ok=True)
+    tmp = dest.with_name(f".{dest.name}.{os.getpid()}.tmp")
+    cropped.save(tmp, format="PNG")
+    size = tmp.stat().st_size
+    os.replace(tmp, dest)
+    return size
+
+
 def build_cache(manifest, force=False):
     written = skipped = 0
     for row in manifest.itertuples():
-        source = common.PROJECT_ROOT / row.path
+        source = common.resolve_source_path(row.path)
         dest = common.PROJECT_ROOT / row.crop_path
         top, left = int(row.crop_top), int(row.crop_left)
         height, width = int(row.crop_height), int(row.crop_width)
@@ -83,33 +126,90 @@ def build_cache(manifest, force=False):
         if not force and is_cached(dest, (width, height)):
             skipped += 1
             continue
-        if not source.exists():
-            raise SystemExit(f"source image missing: {source}\nre-run the sample importers.")
 
-        dest.parent.mkdir(parents=True, exist_ok=True)
-        with Image.open(source) as image:
-            if image.size != (int(row.source_width), int(row.source_height)):
-                raise SystemExit(
-                    f"{row.image_id}: manifest records {row.source_width}x{row.source_height} "
-                    f"but {source} is {image.width}x{image.height}; the manifest is stale, "
-                    f"rebuild it with imports/build_manifest.py"
-                )
-            if left + width > image.width or top + height > image.height:
-                raise SystemExit(
-                    f"{row.image_id}: crop box (top={top}, left={left}, height={height}, "
-                    f"width={width}) does not fit in {image.width}x{image.height}"
-                )
-            image = image.convert("RGB")
-            image.crop((left, top, left + width, top + height)).save(dest, format="PNG")
+        try:
+            crop_one(source, dest, int(row.source_width), int(row.source_height),
+                     top, left, height, width)
+        except FileNotFoundError:
+            raise SystemExit(f"source image missing: {source}\nre-run the sample importers.")
+        except ManifestMismatch as error:
+            raise SystemExit(f"{row.image_id}: {error}")
         written += 1
 
     return written, skipped
+
+
+def _origin_of(row):
+    """A per-row label for grouping benchmark timings.
+
+    origin_dataset isn't a manifest column (build_manifest.py doesn't carry it through), but for
+    authentic rows it's recoverable from the image_id prefix (e.g. "COCO2017_train/100000" ->
+    "COCO2017_train"); for fakes, generator_family is already the right granularity.
+    """
+    if int(row.label) == common.REAL_LABEL:
+        return str(row.image_id).split("/", 1)[0]
+    return str(row.generator_family)
+
+
+def benchmark_cache(manifest, force=False):
+    """Time crop_one() per row, grouped by origin, and print an images/s table.
+
+    Reuses the exact production path (crop_one(), common.resolve_source_path()) rather than a
+    separate timing harness, so the numbers describe the real job, not an approximation of it.
+    Pass --force so cached rows aren't silently skipped -- a benchmark that skips most of its
+    sample measures is_cached(), not the crop.
+    """
+    samples, written_bytes, errors = {}, {}, []
+
+    for row in manifest.itertuples():
+        source = common.resolve_source_path(row.path)
+        dest = common.PROJECT_ROOT / row.crop_path
+        top, left = int(row.crop_top), int(row.crop_left)
+        height, width = int(row.crop_height), int(row.crop_width)
+        origin = _origin_of(row)
+
+        if not force and is_cached(dest, (width, height)):
+            continue
+
+        started = time.perf_counter()
+        try:
+            size = crop_one(source, dest, int(row.source_width), int(row.source_height),
+                             top, left, height, width)
+        except FileNotFoundError:
+            errors.append(f"{row.image_id}: source missing ({source})")
+            continue
+        except ManifestMismatch as error:
+            errors.append(f"{row.image_id}: {error}")
+            continue
+        elapsed = time.perf_counter() - started
+
+        samples.setdefault(origin, []).append(elapsed)
+        written_bytes[origin] = written_bytes.get(origin, 0) + size
+
+    total_n = sum(len(v) for v in samples.values())
+    total_s = sum(sum(v) for v in samples.values())
+    print(f"\nbenchmark: {total_n} images, {total_s:.1f}s total, "
+          f"{(total_n / total_s if total_s else 0):.1f} images/s overall")
+    if errors:
+        print(f"  {len(errors)} error(s) skipped, first: {errors[0]}")
+    print(f"{'origin':<20} {'n':>6} {'images/s':>10} {'p50 ms':>8} {'p95 ms':>8} {'MB':>8}")
+    for origin in sorted(samples):
+        times = sorted(samples[origin])
+        n, s = len(times), sum(times)
+        p50 = times[int(0.50 * (n - 1))] * 1000
+        p95 = times[int(0.95 * (n - 1))] * 1000
+        print(f"{origin:<20} {n:>6} {(n / s if s else 0):>10.1f} {p50:>8.1f} {p95:>8.1f} "
+              f"{written_bytes[origin] / 1e6:>8.1f}")
+
+    return total_n, total_s
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--manifest", type=Path, default=common.PROJECT_ROOT / "manifest.csv")
     parser.add_argument("--force", action="store_true", help="rewrite crops that are already cached")
+    parser.add_argument("--benchmark", action="store_true",
+                         help="time crop_one() per row, grouped by origin, instead of building the cache")
     args = parser.parse_args()
 
     # No --size/--align here: the geometry comes from the manifest. They used to be accepted,
@@ -122,6 +222,10 @@ def main():
             f"{args.manifest} is missing {', '.join(missing)}; "
             f"rebuild it with imports/build_manifest.py"
         )
+
+    if args.benchmark:
+        benchmark_cache(manifest, force=args.force)
+        return
 
     written, skipped = build_cache(manifest, force=args.force)
 
