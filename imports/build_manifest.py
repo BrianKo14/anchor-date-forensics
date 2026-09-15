@@ -130,23 +130,36 @@ def crop_path(file_id, policy_id):
 def crop_box(width, height, size, align):
     """Centre crop of `size`, origin snapped down to a multiple of `align`.
 
-    Returns (top, left, height, width) -- torchvision's crop-parameter order, which is also
-    what AI-GenBench's RandomCropIfLarge.get_crop_params emits, so the two are directly
-    comparable if this policy is ever swapped for that transform. Note the differences that
-    would come with such a swap: RandomCropIfLarge crops to min(side, size) per axis, i.e. it
-    leaves an under-size axis alone rather than raising, and it does not align the origin.
-    Neither matters for the current sample (imaging.decode_and_validate already rejects
-    anything under common.IMAGE_MIN_SIZE == 200, so every crop here is a full 200x200), but
-    the alignment does: see preprocess_crop_cache.py on why the origin is snapped to 16.
+    The centring itself is a port of AI-GenBench's RandomCropIfLarge.get_crop_params
+    (training_and_evaluation/lightning_data_modules/augmentation_utils/random_crop_if_large.py,
+    the force_central_crop=True branch: crop_width/height = min(side, threshold), origin =
+    (side - crop_side) // 2), not a reimplementation from scratch -- same convention imaging.py
+    uses for AI-GenBench's prepare_image. Importing the class itself would pull torch and
+    torchvision into a venv that otherwise needs neither, plus the rest of that package's
+    __init__ chain (pytorch_lightning, albumentations), for six lines of arithmetic.
+
+    Two things this project adds on top of the ported formula:
+      * the align-down-to-16 step, which AI-GenBench's version does not do -- see
+        preprocess_crop_cache.py for why (JPEG block-grid preservation).
+      * raising on an under-size image rather than AI-GenBench's min(side, threshold), which
+        would silently return a *smaller-than-size* crop instead. Doesn't currently trigger --
+        imaging.decode_and_validate already rejects anything under common.IMAGE_MIN_SIZE == 200,
+        so every crop here is a full 200x200 -- but a silent short crop is exactly the kind of
+        thing that belongs in the manifest's audit trail if the size floor ever changes.
+
+    Returns (top, left, height, width) -- torchvision's crop-parameter order, matching what
+    get_crop_params itself returns.
 
     Nothing is ever upscaled or resampled -- this policy only ever removes pixels, which is
     what keeps RAISE's 4928x3264 scans out of the interpolation that a resize would impose.
     """
     if width < size or height < size:
         raise ValueError(f"image is {width}x{height}, smaller than the {size}x{size} crop")
-    left = ((width - size) // 2 // align) * align
-    top = ((height - size) // 2 // align) * align
-    return top, left, size, size
+    crop_width = min(width, size)
+    crop_height = min(height, size)
+    left = ((width - crop_width) // 2 // align) * align
+    top = ((height - crop_height) // 2 // align) * align
+    return top, left, crop_height, crop_width
 
 
 def family_of(row):
