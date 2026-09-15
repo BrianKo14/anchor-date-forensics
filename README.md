@@ -22,7 +22,8 @@ committed versions have them removed.
 
 A miniature of AI-GenBench: **612 authentic + 612 fake** images, exactly 50/50, with 17 images from
 each of the 36 benchmark generators and 204 from each of the three authentic sources. It lands in
-`data/` (gitignored).
+`data/` (gitignored) by default — set `AIGENBENCH_DATA_ROOT` to point everything at a data root
+outside the repo instead (the lab server exports this to `/data/aigenbench`, see CLAUDE.md).
 
 612 rather than a round 600 because the two halves have to stay exactly 50/50 *and* the fake half
 uniform over 36 generators, so the shared total must be a multiple of 36 -- 612 is the smallest one
