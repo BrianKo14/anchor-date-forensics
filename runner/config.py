@@ -63,8 +63,12 @@ class Member:
 PANEL = [
     Member("cnndetection", "cnndetection"),
     Member("univfd", "univfd"),
-    Member("dmimagedetection_progan", "dmimagedetection", ["--model", "Grag2021_progan"]),
-    Member("dmimagedetection_latent", "dmimagedetection", ["--model", "Grag2021_latent"]),
+    # batch 16, not the default 64: this network is fully convolutional and its score is the mean
+    # of a spatial logit map, so activations are far larger than a classifier's and 64 OOMs the
+    # 10 GB card. Measured 2026-09-25: batches of 8, 16 and 32 all score 1,000 images in 11.7 s,
+    # so the smaller batch is free -- it is compute-bound, not batch-bound.
+    Member("dmimagedetection_progan", "dmimagedetection", ["--model", "Grag2021_progan"], batch=16),
+    Member("dmimagedetection_latent", "dmimagedetection", ["--model", "Grag2021_latent"], batch=16),
     # --require-all-aes because this run is configured to match the paper. Without a Hugging Face
     # token for the gated stabilityai/stable-diffusion-2-base repo, run_score.py would otherwise
     # degrade to two of three autoencoders, print a warning nobody reads at 3am, and produce a
