@@ -212,6 +212,7 @@ def main():
         device=args.device,
         n_rows=len(manifest),
         elapsed_s=timer.elapsed,
+        batch_size=batch_size,
         extra={
             "autoencoders_configured": [r for r, _, _ in AUTOENCODERS],
             "autoencoders_used": list(per_ae),

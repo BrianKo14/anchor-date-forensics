@@ -100,7 +100,7 @@ def write_scores(out_path, image_ids, scores):
 
 
 def write_meta(out_path, detector, upstream_repo, upstream_dir, weights, score_semantics,
-               manifest_path, device, n_rows, elapsed_s, extra=None):
+               manifest_path, device, n_rows, elapsed_s, extra=None, batch_size=None):
     """Sidecar recording the triple that makes a score file reproducible.
 
     manifest sha256 + crop policy + panel version. Without it, comparing experiment 02's
@@ -129,6 +129,11 @@ def write_meta(out_path, detector, upstream_repo, upstream_dir, weights, score_s
         "crop_policy": crop_policy,
         "runtime": {
             "device": device,
+            # Recorded because it is not inert: on CUDA, cuDNN picks kernels per batch shape, and
+            # the same 1,000 images scored at batch 8 vs 32 differ in the fourth decimal. Too small
+            # to change a conclusion, large enough that two score files will not compare equal, and
+            # not something you can reconstruct afterwards without it.
+            "batch_size": batch_size,
             "torch": torch.__version__,
             "python": platform.python_version(),
             "platform": platform.platform(),

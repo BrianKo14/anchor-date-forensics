@@ -106,6 +106,7 @@ def main():
         device=args.device,
         n_rows=len(manifest),
         elapsed_s=timer.elapsed,
+        batch_size=args.batch_size,
         extra={
             "checkpoint": args.model,
             "preprocessing": "shared 200x200 crop; get_list_norm('resnet'); no additional crop",
