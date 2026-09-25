@@ -12,3 +12,8 @@ tqdm>=4.70
 ipykernel>=7.0
 jupyterlab>=4.6
 nbstripout>=0.9
+
+# runner/'s dashboard. Optional at runtime -- pipeline.py logs a warning and scores without it
+# if they are absent -- but an overnight run is much easier to trust when you can see it.
+fastapi>=0.115
+uvicorn>=0.32
