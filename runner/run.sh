@@ -1,8 +1,11 @@
 #!/usr/bin/env bash
 # Start (or attach to) the unattended scoring run on the lab server.
 #
-#   ./runner/run.sh start <manifest> <out-dir>   launch detached; survives logout
-#   ./runner/run.sh smoke <manifest> <out-dir>   ~5 min rehearsal of the whole path
+#   ./runner/run.sh start <manifest> <out-dir> [args...]   launch detached; survives logout
+#   ./runner/run.sh smoke <manifest> <out-dir> [limit]     rehearsal of the whole path
+#
+# Anything after <out-dir> on `start` is passed through to runner.pipeline, e.g.
+#   ./runner/run.sh start m.csv out/ --detectors cnndetection univfd
 #   ./runner/run.sh attach                       watch the console output
 #   ./runner/run.sh status                       is it alive, and how far along
 #   ./runner/run.sh stop                         ask it to stop cleanly (resumable)
@@ -44,7 +47,12 @@ case "${1:-}" in
       exit 1
     fi
     args="--manifest '$manifest' --out-dir '$outdir'"
-    [[ "$1" == "smoke" ]] && args="$args --smoke --limit ${4:-40}"
+    if [[ "$1" == "smoke" ]]; then
+      args="$args --smoke --limit ${4:-40}"
+    else
+      shift 3
+      for extra in "$@"; do args="$args '$extra'"; done
+    fi
     LOG="$LOGDIR/scoring-$(date +%Y%m%d-%H%M%S).log"
 
     # setsid detaches tmux from this SSH session's process group, so even a hard disconnect
