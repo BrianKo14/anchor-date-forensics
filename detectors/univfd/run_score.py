@@ -84,6 +84,7 @@ def main():
         device=args.device,
         n_rows=len(manifest),
         elapsed_s=timer.elapsed,
+        batch_size=args.batch_size,
         extra={
             "arch": ARCH,
             "preprocessing": "shared 200x200 crop; uniform bicubic resize 200->224; CLIP Normalize",

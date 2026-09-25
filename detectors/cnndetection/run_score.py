@@ -76,6 +76,7 @@ def main():
         device=args.device,
         n_rows=len(manifest),
         elapsed_s=timer.elapsed,
+        batch_size=args.batch_size,
         extra={"preprocessing": "shared 200x200 crop; ToTensor + imagenet Normalize (demo.py)"},
     )
     panel_io.report(args.out, scores, timer.elapsed)
