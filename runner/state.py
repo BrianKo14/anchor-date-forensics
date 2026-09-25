@@ -114,11 +114,30 @@ class State:
     # -- chunks ----------------------------------------------------------------------------------
 
     def add_chunks(self, rows):
-        """Bulk-insert the plan. Idempotent: re-planning never disturbs a completed chunk."""
+        """Bulk-insert the plan. Re-planning leaves completed chunks alone -- unless their geometry
+        moved.
+
+        A plain INSERT OR IGNORE is wrong here. Chunks are keyed by (detector, seq), but `seq` only
+        means anything relative to a chunk size: re-planning the same manifest at 500 rows per chunk
+        instead of 20 makes seq 0 a different span of the manifest while the key stays identical.
+        The old row survives, reconcile() finds the old 20-row output still on disk, marks the chunk
+        done, and the merge silently ships 20 scores where 500 were planned. So a changed (start, n)
+        resets the chunk to pending.
+        """
         with self._lock:
             self._db.executemany(
-                "INSERT OR IGNORE INTO chunks (detector, seq, start, n, status, updated_at)"
-                " VALUES (?, ?, ?, ?, 'pending', ?)",
+                "INSERT INTO chunks (detector, seq, start, n, status, updated_at)"
+                " VALUES (?, ?, ?, ?, 'pending', ?)"
+                " ON CONFLICT(detector, seq) DO UPDATE SET"
+                "   status = CASE WHEN chunks.start != excluded.start OR chunks.n != excluded.n"
+                "                 THEN 'pending' ELSE chunks.status END,"
+                "   error = CASE WHEN chunks.start != excluded.start OR chunks.n != excluded.n"
+                "                THEN NULL ELSE chunks.error END,"
+                "   attempts = CASE WHEN chunks.start != excluded.start OR chunks.n != excluded.n"
+                "                   THEN 0 ELSE chunks.attempts END,"
+                "   start = excluded.start,"
+                "   n = excluded.n,"
+                "   updated_at = excluded.updated_at",
                 [(r["detector"], r["seq"], r["start"], r["n"], time.time()) for r in rows],
             )
             self._db.commit()
@@ -276,6 +295,15 @@ def chunk_score_path(detector, seq):
     return config.WORK_DIR / "scores" / detector / f"{seq:05d}.csv"
 
 
+def scored_rows(path):
+    """Data rows in a chunk's score CSV, or -1 if it cannot be read."""
+    try:
+        with path.open() as handle:
+            return max(0, sum(1 for _ in handle) - 1)
+    except OSError:
+        return -1
+
+
 def chunk_manifest_path(chunk_size, seq):
     """Keyed by chunk size, not detector: members sharing a size share the slice files."""
     return config.WORK_DIR / "chunks" / str(chunk_size) / f"{seq:05d}.csv"
@@ -289,12 +317,15 @@ def reconcile(state, verbose=True):
     than a re-score of everything that had already finished.
     """
     with state._lock:
-        rows = state._db.execute("SELECT id, detector, seq, status FROM chunks").fetchall()
+        rows = state._db.execute("SELECT id, detector, seq, n, status FROM chunks").fetchall()
 
     to_pending, to_done = [], []
     for row in rows:
         path = chunk_score_path(row["detector"], row["seq"])
-        present = path.exists() and path.stat().st_size > 0
+        # Complete means the right length, not merely present. An output left over from a plan at a
+        # different chunk size sits at exactly this path with the wrong number of rows, and
+        # accepting it would put a short score file into the merge.
+        present = path.exists() and path.stat().st_size > 0 and scored_rows(path) == row["n"]
         if row["status"] == DONE and not present:
             to_pending.append(row["id"])
         elif row["status"] in (PENDING, ACTIVE, FAILED) and present:
