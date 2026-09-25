@@ -96,11 +96,13 @@ def slug(repo_id):
 
 
 @torch.no_grad()
-def reconstruct(paths, repo_id, subfolder, cls, out_dir, device, batch_size):
+def reconstruct(paths, repo_id, subfolder, cls, out_dir, device, batch_size, dtype=torch.float32):
     """AE round-trip, mirroring aeroblade.image.compute_reconstructions.
 
-    fp32 rather than upstream's fp16: there is no CUDA here, and fp16 on CPU is
-    unusably slow. Recorded as a deviation in the sidecar.
+    `dtype` is upstream's fp16 on CUDA and fp32 everywhere else. It is an explicit argument
+    rather than something inferred from the device because the two produce different scores,
+    and a flag that silently changes its value with the machine is how two runs end up
+    incomparable with nothing in either sidecar to say why.
     """
     out_dir.mkdir(parents=True, exist_ok=True)
     targets = [out_dir / f"{p.stem}.png" for p in paths]
@@ -110,7 +112,7 @@ def reconstruct(paths, repo_id, subfolder, cls, out_dir, device, batch_size):
         try:
             # No use_safetensors=True: the 2022-era CompVis repo ships only .bin, and
             # diffusers already prefers safetensors wherever they exist.
-            ae = cls.from_pretrained(repo_id, subfolder=subfolder)
+            ae = cls.from_pretrained(repo_id, subfolder=subfolder, torch_dtype=dtype)
         except Exception as exc:
             if is_auth_error(exc):
                 raise GatedAutoencoder(repo_id) from exc
@@ -137,6 +139,10 @@ def reconstruct(paths, repo_id, subfolder, cls, out_dir, device, batch_size):
         del ae
         if device == "mps":
             torch.mps.empty_cache()
+        elif device.startswith("cuda"):
+            # Three autoencoders load in sequence; without this the first one's weights are still
+            # resident when the second allocates, which is what tips a 10 GB card over.
+            torch.cuda.empty_cache()
 
     return targets
 
@@ -146,9 +152,17 @@ def main():
     parser.add_argument("--recon-dir", type=Path, default=HERE / "reconstructions")
     parser.add_argument("--require-all-aes", action="store_true",
                         help="fail instead of degrading when an autoencoder needs HF credentials")
+    parser.add_argument("--dtype", choices=["fp32", "fp16"], default="fp32",
+                        help="autoencoder precision. fp16 is upstream's own choice and needs CUDA; "
+                             "fp32 is the default because it is the only one that works everywhere, "
+                             "and the two do not produce identical scores")
     args = parser.parse_args()
     # The VAEs are the memory-heavy step; 16 images of 200x200 at once is plenty.
     batch_size = min(args.batch_size, 8)
+
+    if args.dtype == "fp16" and not args.device.startswith("cuda"):
+        raise SystemExit(f"--dtype fp16 needs a CUDA device; --device is {args.device!r}")
+    dtype = torch.float16 if args.dtype == "fp16" else torch.float32
 
     manifest = panel_io.load_manifest(args.manifest, args.limit)
     originals = list(manifest["image_file"])
@@ -165,7 +179,8 @@ def main():
             try:
                 recons = reconstruct(
                     originals, repo_id, subfolder, cls,
-                    args.recon_dir / policy / slug(repo_id), args.device, batch_size,
+                    args.recon_dir / policy / args.dtype / slug(repo_id),
+                    args.device, batch_size, dtype,
                 )
             except GatedAutoencoder as exc:
                 gated.append(exc.repo_id)
@@ -203,8 +218,11 @@ def main():
             "autoencoders_skipped_needs_hf_auth": gated,
             "distance_metric": DISTANCE_METRIC,
             "seed": SEED,
+            "autoencoder_dtype": args.dtype,
             "deviations_from_upstream": [
-                "fp32 instead of fp16 (no CUDA available; fp16 on CPU is unusably slow)",
+                *([] if args.dtype == "fp16" else
+                  [f"{args.dtype} instead of upstream's fp16 (fp16 needs CUDA, and on CPU it is "
+                   f"unusably slow)"]),
                 "autoencoders loaded directly instead of via AutoPipelineForImage2Image",
                 "no torch.compile, no enable_model_cpu_offload",
             ],

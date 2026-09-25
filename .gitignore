@@ -105,3 +105,6 @@ config.ssh
 *.swp
 *.swo
 *~
+
+# Runner state: job database and logs, per-machine.
+var/
