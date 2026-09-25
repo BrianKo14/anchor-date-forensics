@@ -1,0 +1,163 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>panel scoring</title>
+<style>
+  :root {
+    color-scheme: light dark;
+    --bg: #f6f6f4; --fg: #1a1a18; --dim: #6b6b64; --line: #d8d8d2;
+    --card: #fff; --ok: #2f7d4f; --warn: #a8700f; --bad: #b03030; --bar: #2f6f9f;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg:#16161a; --fg:#e8e8e4; --dim:#93938c; --line:#31313a;
+            --card:#1e1e24; --ok:#66c08a; --warn:#d6a24a; --bad:#e07070; --bar:#5aa0d8; }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--fg); font: 14px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace; }
+  .wrap { max-width: 1000px; margin: 0 auto; padding: 24px 16px 64px; }
+  h1 { font-size: 15px; margin: 0 0 2px; letter-spacing: .04em; text-transform: uppercase; }
+  .sub { color: var(--dim); margin-bottom: 20px; font-size: 13px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: 14px 16px; margin-bottom: 12px; }
+  .row { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+  .name { font-weight: 600; }
+  .dim { color: var(--dim); }
+  .track { height: 7px; background: color-mix(in srgb, var(--line) 70%, transparent); border-radius: 4px; overflow: hidden; margin: 9px 0 6px; }
+  .fill { height: 100%; background: var(--bar); transition: width .4s ease; }
+  .fill.done { background: var(--ok); }
+  table { width: 100%; border-collapse: collapse; }
+  td { padding: 2px 0; vertical-align: top; }
+  td.k { color: var(--dim); width: 128px; white-space: nowrap; }
+  .ev { max-height: 260px; overflow-y: auto; font-size: 12.5px; }
+  .ev div { padding: 1px 0; white-space: pre-wrap; word-break: break-word; }
+  .lv-error { color: var(--bad); } .lv-warn { color: var(--warn); }
+  button { font: inherit; padding: 5px 12px; border: 1px solid var(--line); border-radius: 6px;
+           background: var(--card); color: var(--fg); cursor: pointer; }
+  button:hover { border-color: var(--dim); }
+  .banner { border-left: 3px solid var(--warn); padding-left: 10px; color: var(--warn); margin-bottom: 12px; }
+  .gpu { display: inline-block; margin-right: 18px; }
+</style>
+
+<div class="wrap">
+  <h1>Detector panel &mdash; scoring</h1>
+  <div class="sub" id="sub">connecting&hellip;</div>
+  <div id="banners"></div>
+
+  <div class="card">
+    <div class="row"><span class="name">overall</span><span class="dim" id="o-txt"></span></div>
+    <div class="track"><div class="fill" id="o-bar" style="width:0%"></div></div>
+    <div class="row">
+      <span class="dim" id="o-rate"></span>
+      <span>
+        <button onclick="act('stop')">stop</button>
+        <button id="pause" onclick="togglePause()">pause</button>
+      </span>
+    </div>
+  </div>
+
+  <div id="detectors"></div>
+
+  <div class="card">
+    <div class="name">machine</div>
+    <table><tbody id="machine"></tbody></table>
+  </div>
+
+  <div class="card" id="fail-card" hidden>
+    <div class="row"><span class="name">failed chunks</span>
+      <button onclick="act('retry-failed')">retry all</button></div>
+    <div class="ev" id="failures"></div>
+  </div>
+
+  <div class="card">
+    <div class="name">events</div>
+    <div class="ev" id="events"></div>
+  </div>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+let paused = false;
+
+const dur = s => {
+  if (s === null || s === undefined) return '–';
+  s = Math.round(s);
+  const h = Math.floor(s / 3600), m = Math.floor(s % 3600 / 60);
+  return h ? `${h}h ${m}m` : (m ? `${m}m ${s % 60}s` : `${s}s`);
+};
+const gb = b => (b / 1e9).toFixed(0) + ' GB';
+
+async function act(action) {
+  await fetch('/api/action', {method: 'POST', headers: {'Content-Type': 'application/json'},
+                              body: JSON.stringify({action})});
+  tick();
+}
+async function togglePause() {
+  await fetch('/api/control', {method: 'POST', headers: {'Content-Type': 'application/json'},
+                               body: JSON.stringify({paused: paused ? '0' : '1'})});
+  tick();
+}
+
+function render(s) {
+  paused = s.paused;
+  $('sub').textContent =
+    `${s.overall.images_done.toLocaleString()} of ${s.overall.images_total.toLocaleString()} scores`
+    + ` · running ${dur(s.elapsed)}`;
+
+  const banners = [];
+  if (s.stopping) banners.push('stopping — finishing the chunks in flight');
+  if (s.paused) banners.push('paused from the dashboard');
+  if (s.courtesy_paused) banners.push(`held by the courtesy PAUSE file at ${s.pause_file}`);
+  for (const [gpu, reason] of Object.entries(s.governor.blocked || {}))
+    banners.push(`gpu ${gpu} standing down — ${reason}`);
+  $('banners').innerHTML = banners.map(b => `<div class="banner">${b}</div>`).join('');
+
+  $('o-txt').textContent = s.overall.pct + '%';
+  $('o-bar').style.width = s.overall.pct + '%';
+  $('o-bar').className = 'fill' + (s.overall.pct >= 100 ? ' done' : '');
+  $('o-rate').textContent = `${s.overall.images_per_s} img/s across ${
+    Object.keys(s.governor.memory || {}).length || 1} gpu`;
+  $('pause').textContent = s.paused ? 'resume' : 'pause';
+
+  $('detectors').innerHTML = s.detectors.map(d => `
+    <div class="card">
+      <div class="row">
+        <span class="name">${d.name}</span>
+        <span class="dim">${d.images_done.toLocaleString()} / ${d.images_total.toLocaleString()}
+          · ${d.pct}%</span>
+      </div>
+      <div class="track"><div class="fill${d.pct >= 100 ? ' done' : ''}" style="width:${d.pct}%"></div></div>
+      <div class="row dim">
+        <span>chunks: ${d.chunks.done} done, ${d.chunks.active} active, ${d.chunks.pending} pending${
+          d.chunks.failed ? `, <span class="lv-error">${d.chunks.failed} failed</span>` : ''}</span>
+        <span>${d.ms_per_image ? d.ms_per_image + ' ms/img' : '–'} · eta ${dur(d.eta_seconds)}</span>
+      </div>
+    </div>`).join('');
+
+  const mem = Object.entries(s.governor.memory || {}).map(([g, m]) =>
+    `<span class="gpu">gpu${g}: ${m[2]}% util, ${(m[0] / 1024).toFixed(1)}/${(m[1] / 1024).toFixed(0)} GiB</span>`
+  ).join('');
+  $('machine').innerHTML = `
+    <tr><td class="k">gpus</td><td>${mem || '–'}</td></tr>
+    <tr><td class="k">load</td><td>${s.governor.load} (holds above ${s.governor.load_pause})</td></tr>
+    <tr><td class="k">work disk</td><td>${gb(s.disk.free)} free of ${gb(s.disk.total)} (${s.disk.used_pct}% used)</td></tr>`;
+
+  $('fail-card').hidden = !s.failures.length;
+  $('failures').innerHTML = s.failures.map(f =>
+    `<div class="lv-error">${f.detector} chunk ${f.seq} (attempt ${f.attempts}): ${f.error || ''}</div>`
+  ).join('');
+
+  $('events').innerHTML = s.events.map(e => {
+    const t = new Date(e.ts * 1000).toTimeString().slice(0, 8);
+    return `<div class="lv-${e.level}">${t}  ${(e.source || '-').padEnd(12)} ${e.msg}</div>`;
+  }).join('');
+}
+
+async function tick() {
+  try {
+    render(await (await fetch('/api/status')).json());
+  } catch (err) {
+    $('sub').textContent = 'lost contact with the run — retrying…';
+  }
+}
+tick();
+setInterval(tick, 2000);
+</script>
