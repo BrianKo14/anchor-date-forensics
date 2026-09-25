@@ -16,4 +16,6 @@ fetch() { # url dest
 }
 fetch "https://www.dropbox.com/s/2g2jagq2jn1fd0i/blur_jpg_prob0.5.pth?dl=1" "$DEST/blur_jpg_prob0.5.pth"
 fetch "https://www.dropbox.com/s/h7tkpcgiwuftb6g/blur_jpg_prob0.1.pth?dl=1" "$DEST/blur_jpg_prob0.1.pth"
-echo "--- sha256 ---"; shasum -a 256 "$DEST"/*.pth
+# sha256sum on Linux, shasum on macOS.
+echo "--- sha256 ---"
+if command -v sha256sum >/dev/null; then sha256sum "$DEST"/*.pth; else shasum -a 256 "$DEST"/*.pth; fi

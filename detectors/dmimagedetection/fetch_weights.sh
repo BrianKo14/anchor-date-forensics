@@ -31,4 +31,10 @@ unzip -o -q "$ZIP" -d "$DEST"
 if [ -d "$DEST/weights" ]; then
   mv "$DEST"/weights/* "$DEST"/ && rmdir "$DEST/weights"
 fi
-echo "--- weights ---"; find "$DEST" -name "*.pth" -exec shasum -a 256 {} \;
+# sha256sum on Linux, shasum on macOS.
+echo "--- weights ---"
+if command -v sha256sum >/dev/null; then
+  find "$DEST" -name "*.pth" -exec sha256sum {} \;
+else
+  find "$DEST" -name "*.pth" -exec shasum -a 256 {} \;
+fi
