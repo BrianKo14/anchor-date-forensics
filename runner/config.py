@@ -65,7 +65,12 @@ PANEL = [
     Member("univfd", "univfd"),
     Member("dmimagedetection_progan", "dmimagedetection", ["--model", "Grag2021_progan"]),
     Member("dmimagedetection_latent", "dmimagedetection", ["--model", "Grag2021_latent"]),
-    Member("aeroblade", "aeroblade", ["--dtype", "fp16"], chunk=2500, batch=32),
+    # --require-all-aes because this run is configured to match the paper. Without a Hugging Face
+    # token for the gated stabilityai/stable-diffusion-2-base repo, run_score.py would otherwise
+    # degrade to two of three autoencoders, print a warning nobody reads at 3am, and produce a
+    # score file that looks exactly like a good one. Failing the chunk is the honest outcome.
+    Member("aeroblade", "aeroblade", ["--dtype", "fp16", "--require-all-aes"],
+           chunk=2500, batch=32),
 ]
 
 PANEL_BY_NAME = {m.name: m for m in PANEL}
