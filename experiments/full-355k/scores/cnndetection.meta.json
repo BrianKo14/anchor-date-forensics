@@ -1,0 +1,38 @@
+{
+  "detector": "cnndetection",
+  "score_semantics": "pre_sigmoid_logit",
+  "score_orientation": "higher_is_more_synthetic",
+  "upstream_repo": "https://github.com/PeterWang512/CNNDetection",
+  "upstream_commit": "ea0b5622365e3a9cd31d1b54b6b5971131a839ab",
+  "weights": [
+    {
+      "path": "detectors/cnndetection/CNNDetection/weights/blur_jpg_prob0.5.pth",
+      "sha256": "3533f3e58a3b82215f21197f2faf4e99b911ec42a4a6e2d7823e04d5f3fd245a"
+    }
+  ],
+  "manifest": {
+    "path": "experiments/full-355k/manifest.csv",
+    "sha256": "80ed852de9d5fc82aa217321905660a353eb345924619bacdc31d9c645d20cd0",
+    "rows": 355638
+  },
+  "crop_policy": "crop200_align16",
+  "runtime": {
+    "device": "cuda",
+    "batch_size": 64,
+    "torch": "2.5.1+cu118",
+    "python": "3.12.8",
+    "platform": "Linux-5.4.0-216-generic-x86_64-with-glibc2.31"
+  },
+  "elapsed_s": 2121.3,
+  "generated_at": "2026-09-26T15:49:47+00:00",
+  "preprocessing": "shared 200x200 crop; ToTensor + imagenet Normalize (demo.py)",
+  "execution": {
+    "mode": "chunked",
+    "chunks": 143,
+    "chunk_size": 2500,
+    "scoring_seconds": 2121.3,
+    "wall_seconds": 2908.5,
+    "images_per_second": 122.28,
+    "note": "scored in chunks by runner/. scoring_seconds is the sum of each chunk's own timer (inference only); wall_seconds is the sum of subprocess wall times and includes the per-chunk model load. Both are sums across workers, so with two GPUs they exceed the run's wall clock."
+  }
+}

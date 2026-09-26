@@ -1,0 +1,39 @@
+{
+  "detector": "dmimagedetection_latent",
+  "score_semantics": "logit_spatial_mean",
+  "score_orientation": "higher_is_more_synthetic",
+  "upstream_repo": "https://github.com/grip-unina/DMimageDetection",
+  "upstream_commit": "745ad9e1eee82bdac4aab6e1e7e7dbf20753633a",
+  "weights": [
+    {
+      "path": "detectors/dmimagedetection/DMimageDetection/test_code/weights/Grag2021_latent/model_epoch_best.pth",
+      "sha256": "0168451e84a2a35d0b141ad4f2e361a74efdd06eb8d11434087f8a0bb6e3abad"
+    }
+  ],
+  "manifest": {
+    "path": "experiments/full-355k/manifest.csv",
+    "sha256": "80ed852de9d5fc82aa217321905660a353eb345924619bacdc31d9c645d20cd0",
+    "rows": 355638
+  },
+  "crop_policy": "crop200_align16",
+  "runtime": {
+    "device": "cuda",
+    "batch_size": 16,
+    "torch": "2.5.1+cu118",
+    "python": "3.12.8",
+    "platform": "Linux-5.4.0-216-generic-x86_64-with-glibc2.31"
+  },
+  "elapsed_s": 3716.5,
+  "generated_at": "2026-09-26T15:49:51+00:00",
+  "checkpoint": "Grag2021_latent",
+  "preprocessing": "shared 200x200 crop; get_list_norm('resnet'); no additional crop",
+  "execution": {
+    "mode": "chunked",
+    "chunks": 143,
+    "chunk_size": 2500,
+    "scoring_seconds": 3716.5,
+    "wall_seconds": 4453.2,
+    "images_per_second": 79.86,
+    "note": "scored in chunks by runner/. scoring_seconds is the sum of each chunk's own timer (inference only); wall_seconds is the sum of subprocess wall times and includes the per-chunk model load. Both are sums across workers, so with two GPUs they exceed the run's wall clock."
+  }
+}
