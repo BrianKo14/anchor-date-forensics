@@ -17,6 +17,7 @@ standing down costs the tail of one chunk, not a re-download.
 
 import getpass
 import os
+import shutil
 import subprocess
 import time
 
@@ -82,6 +83,7 @@ class Governor:
         self.me = getpass.getuser()
         self._blocked = {}          # gpu -> reason, or absent when free
         self._load = 0.0
+        self._disk = {}
         self._checked = 0.0
         self._announced = {}
 
@@ -97,6 +99,21 @@ class Governor:
         if self._load > config.LOAD_PAUSE:
             for gpu in config.GPUS:
                 blocked[gpu] = f"load {self._load:.1f} > {config.LOAD_PAUSE:.0f}"
+
+        # Checked on both volumes, not just the one we write results to: the failure this exists
+        # to prevent was a cache landing somewhere nobody had thought about, on the volume shared
+        # with everyone else's home directory.
+        self._disk = {}
+        for label, path in (("work", config.WORK_DIR), ("root", config.PROJECT_ROOT)):
+            try:
+                free = shutil.disk_usage(path).free
+            except OSError:
+                continue
+            self._disk[label] = free
+            if free < config.MIN_FREE_BYTES:
+                for gpu in config.GPUS:
+                    blocked[gpu] = (f"{label} volume has {free / 1e9:.1f} GB free, "
+                                    f"below the {config.MIN_FREE_BYTES / 1e9:.0f} GB floor")
 
         if config.YIELD_TO_OTHER_GPU_PROCS:
             for gpu, procs in gpu_processes().items():
@@ -125,5 +142,7 @@ class Governor:
             "load": round(self._load, 2),
             "load_pause": round(config.LOAD_PAUSE, 1),
             "blocked": {str(g): r for g, r in self._blocked.items()},
+            "disk_free_gb": {k: round(v / 1e9, 1) for k, v in self._disk.items()},
+            "disk_floor_gb": round(config.MIN_FREE_BYTES / 1e9),
             "memory": {str(g): m for g, m in gpu_memory().items()},
         }
