@@ -1,0 +1,77 @@
+{
+  "stratification": {
+    "per_generator": 500,
+    "keep_whole": [
+      "RAISE"
+    ],
+    "seed": 1234,
+    "benchmark_splits": [
+      "train",
+      "validation"
+    ]
+  },
+  "data_root": "/data/aigenbench",
+  "crop_policy": "crop200_align16",
+  "rows": 36000,
+  "labels": {
+    "authentic": 18000,
+    "fake": 18000
+  },
+  "by_split": {
+    "train": 28837,
+    "validation": 7163
+  },
+  "authentic_by_origin": {
+    "COCO2017_train": 8887,
+    "COCO2017_val": 376,
+    "LAION-400M": 7737,
+    "RAISE": 1000
+  },
+  "fakes_by_generator": {
+    "ADM": 500,
+    "BigGAN": 500,
+    "CIPS": 500,
+    "Cascaded Refinement Networks": 500,
+    "CycleGAN": 500,
+    "DALL-E 3": 500,
+    "DDPM": 500,
+    "DeepFloyd IF": 500,
+    "Denoising Diffusion GAN": 500,
+    "Diffusion GAN (ProjectedGAN)": 500,
+    "Diffusion GAN (StyleGAN2)": 500,
+    "FLUX 1 Dev": 500,
+    "FLUX 1 Schnell": 500,
+    "FaceSynthetics": 500,
+    "GANformer": 500,
+    "GauGAN": 500,
+    "Glide": 500,
+    "IMLE": 500,
+    "LaMa": 500,
+    "Latent Diffusion": 500,
+    "MAT": 500,
+    "Midjourney": 500,
+    "Palette": 500,
+    "ProGAN": 500,
+    "ProjectedGAN": 500,
+    "SN-PatchGAN": 500,
+    "Stable Diffusion 1.4": 500,
+    "Stable Diffusion 1.5": 500,
+    "Stable Diffusion 2.1": 500,
+    "Stable Diffusion XL 1.0": 500,
+    "StarGAN": 500,
+    "StyleGAN1": 500,
+    "StyleGAN2": 500,
+    "StyleGAN3": 500,
+    "VQ-Diffusion": 500,
+    "VQGAN": 500
+  },
+  "fakes_by_family": {
+    "autoregressive": 500,
+    "diffusion": 8000,
+    "gan": 6500,
+    "graphics": 500,
+    "inpainting": 1500,
+    "other": 1000
+  },
+  "generated_at": "2026-09-25T21:18:51+00:00"
+}

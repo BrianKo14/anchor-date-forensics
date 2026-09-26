@@ -1,0 +1,43 @@
+{
+  "detector": "univfd",
+  "score_semantics": "fc_logit",
+  "score_orientation": "higher_is_more_synthetic",
+  "upstream_repo": "https://github.com/WisconsinAIVision/UniversalFakeDetect",
+  "upstream_commit": "030495aea3300a8b54c0ec37ec7fe1dd7e63c619",
+  "weights": [
+    {
+      "path": "detectors/univfd/UniversalFakeDetect/pretrained_weights/fc_weights.pth",
+      "sha256": "477100745713bcc957beb2b40859536859b6483fd6301b3b9293151b194c7847"
+    },
+    {
+      "path": "/home/bkovo/.cache/clip/ViT-L-14.pt",
+      "sha256": "b8cca3fd41ae0c99ba7e8951adf17d267cdb84cd88be6f7c2e0eca1737a03836"
+    }
+  ],
+  "manifest": {
+    "path": "experiments/full-355k/manifest.csv",
+    "sha256": "80ed852de9d5fc82aa217321905660a353eb345924619bacdc31d9c645d20cd0",
+    "rows": 355638
+  },
+  "crop_policy": "crop200_align16",
+  "runtime": {
+    "device": "cuda",
+    "batch_size": 64,
+    "torch": "2.5.1+cu118",
+    "python": "3.12.8",
+    "platform": "Linux-5.4.0-216-generic-x86_64-with-glibc2.31"
+  },
+  "elapsed_s": 6259.3,
+  "generated_at": "2026-09-26T15:49:48+00:00",
+  "arch": "CLIP:ViT-L/14",
+  "preprocessing": "shared 200x200 crop; uniform bicubic resize 200->224; CLIP Normalize",
+  "execution": {
+    "mode": "chunked",
+    "chunks": 143,
+    "chunk_size": 2500,
+    "scoring_seconds": 6259.3,
+    "wall_seconds": 9098.0,
+    "images_per_second": 39.09,
+    "note": "scored in chunks by runner/. scoring_seconds is the sum of each chunk's own timer (inference only); wall_seconds is the sum of subprocess wall times and includes the per-chunk model load. Both are sums across workers, so with two GPUs they exceed the run's wall clock."
+  }
+}
