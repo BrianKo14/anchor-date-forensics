@@ -24,7 +24,8 @@ import state as state_module
 VARIES_PER_CHUNK = {"manifest", "elapsed_s", "generated_at"}
 
 
-def merge_detector(detector, manifest, out_dir, manifest_path, manifest_sha, wall_seconds=None):
+def merge_detector(detector, manifest, out_dir, manifest_path, manifest_sha, wall_seconds=None,
+                   chunk_size=None):
     chunks = sorted((config.WORK_DIR / "scores" / detector).glob("[0-9]*.csv"))
     if not chunks:
         return None, "no chunks"
@@ -44,14 +45,15 @@ def merge_detector(detector, manifest, out_dir, manifest_path, manifest_sha, wal
 
     sidecars = [path.with_suffix(".meta.json") for path in chunks]
     meta, problem = merge_meta(detector, sidecars, manifest_path, manifest_sha, len(scores),
-                               wall_seconds)
+                               wall_seconds, chunk_size)
     if problem:
         return target, problem
     (out_dir / f"{detector}.meta.json").write_text(json.dumps(meta, indent=2) + "\n")
     return target, None
 
 
-def merge_meta(detector, sidecars, manifest_path, manifest_sha, n_rows, wall_seconds=None):
+def merge_meta(detector, sidecars, manifest_path, manifest_sha, n_rows, wall_seconds=None,
+               chunk_size=None):
     """One run-level sidecar from many per-chunk ones, refusing to paper over disagreement."""
     present = [path for path in sidecars if path.exists()]
     if not present:
@@ -79,6 +81,13 @@ def merge_meta(detector, sidecars, manifest_path, manifest_sha, n_rows, wall_sec
     base["execution"] = {
         "mode": "chunked",
         "chunks": len(metas),
+        # Needed to reproduce the scores, not just to describe the run. Measured 2026-09-26:
+        # re-running a manifest at the same chunk and batch size is bit-identical, on either
+        # GPU. Changing the chunk size is not -- it moves images into differently shaped
+        # batches, cuDNN selects kernels per shape, and ~23% of scores shift by up to 0.1% of
+        # the score range. Irrelevant to any conclusion, fatal to a byte-for-byte comparison,
+        # so the geometry that produced these numbers is recorded alongside them.
+        "chunk_size": chunk_size,
         "scoring_seconds": round(scoring, 1),
         "wall_seconds": round(wall_seconds, 1) if wall_seconds else None,
         "images_per_second": round(n_rows / wall_seconds, 2) if wall_seconds else None,
@@ -109,7 +118,8 @@ def merge_all(state, manifest, out_dir, manifest_path, manifest_sha, detectors=N
             continue
 
         wall = sum(c["elapsed_s"] or 0 for c in state.chunks_for(name, state_module.DONE))
-        target, problem = merge_detector(name, manifest, out_dir, manifest_path, manifest_sha, wall)
+        target, problem = merge_detector(name, manifest, out_dir, manifest_path, manifest_sha,
+                                         wall, config.PANEL_BY_NAME[name].chunk)
         if problem and target is None:
             results[name] = f"FAILED: {problem}"
         elif problem:
