@@ -108,3 +108,16 @@ config.ssh
 
 # Runner state: job database and logs, per-machine.
 var/
+
+# --- Experiment artifacts (experiments/<name>/) ---
+# Manifests are derived and exactly reproducible: build_manifest.py plus the recorded seed and
+# data root regenerate them byte for byte, and every score sidecar carries the manifest's
+# sha256, so a rebuild can be verified rather than trusted. The full-dataset one is 84 MB.
+experiments/*/manifest.csv
+# Score CSVs at full-dataset scale are ~20 MB each, ~100 MB per experiment -- Drive, not git,
+# per CLAUDE.md's "Drive for large files". The .meta.json sidecars beside them ARE tracked:
+# they are a few KB and they are the actual provenance record (weights, commits, crop policy,
+# manifest hash, batch size, autoencoders used).
+experiments/*/scores/*.csv
+!experiments/*/*.meta.json
+!experiments/*/scores/*.meta.json
