@@ -83,22 +83,32 @@ None of the clones are patched; the workarounds live in our `run_score.py` files
 - **UniversalFakeDetect** — `validate.py` imports `scipy.ndimage.filters`, removed in scipy
   1.15. Only `models/` is imported, never `validate.py`.
 
-## AEROBLADE and Hugging Face credentials
+## AEROBLADE runs with two of its three autoencoders
 
-Stability has gated every `stabilityai/stable-diffusion-2*` repo, so one of AEROBLADE's three
-autoencoders needs an accepted licence and a token. Without one, `run_score.py` **degrades
-loudly**: it scores with the two reachable autoencoders, prints a warning, and records
-`autoencoders_used` / `autoencoders_skipped_needs_hf_auth` in the sidecar. To restore the
-third:
+The paper uses SD 1.1, SD 2-base and Kandinsky 2.1. **SD 2-base is gone.** As of 2026-09-25 every
+`stabilityai/stable-diffusion-2*` repo returns 401 from the HF API and 404 in a browser *even
+when logged in*, while the rest of the `stabilityai` org serves normally. This is a withdrawal,
+not a gate: there is no licence left to accept, and no token restores it. Earlier revisions of
+this file told you to accept a licence and log in — that advice is dead, and following it wastes
+an afternoon.
+
+So the panel scores AEROBLADE with SD 1.1 and Kandinsky 2.1, and says so: the sidecar records
+`autoencoders_used` and `autoencoders_skipped_needs_hf_auth` on every run. The score is a `max`
+over autoencoders, so a subset can only lower it — conservative toward calling an image
+authentic, which is the safe direction for this project's asymmetric conclusions.
+
+Pin the count on unattended runs, which is what `runner/` does:
 
 ```sh
-# accept the licence at https://huggingface.co/stabilityai/stable-diffusion-2-base first
-detectors/aeroblade/.venv/bin/huggingface-cli login
-rm scores/aeroblade.*      # so the sidecar is rewritten
-./run_all.sh
+--expect-aes 2      # fail unless exactly two loaded
 ```
 
-Pass `--require-all-aes` to make a missing autoencoder fatal instead.
+`--require-all-aes` still exists and is now unsatisfiable; it is kept so that the day SD2
+becomes distributable again, asking for three fails loudly rather than silently scoring two.
+
+A substitute third autoencoder is possible (SD-Turbo is distilled from SD 2.1 and ships a VAE),
+but it cannot be *verified* equivalent — the reference weights are precisely what is
+unobtainable. Do not record a substitute as SD2 in the panel manifest.
 
 ## Adding a detector
 
