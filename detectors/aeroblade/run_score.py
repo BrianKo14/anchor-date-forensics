@@ -59,10 +59,15 @@ AUTOENCODERS = [
     ("stabilityai/stable-diffusion-2-base", "vae", AutoencoderKL),
     ("kandinsky-community/kandinsky-2-1", "movq", VQModel),
 ]
+# Checked 2026-09-25: every stabilityai/stable-diffusion-2* repo returns 401 to the HF API while
+# the rest of the org returns 200, and the repo 404s in a browser even when logged in. It is not
+# gated-pending-acceptance, it is withdrawn -- there is no licence left to accept, so the old
+# "accept the licence and log in" advice sends the reader after something that no longer exists.
 AUTH_HINT = (
-    "   Accept the licence at https://huggingface.co/stabilityai/stable-diffusion-2-base\n"
-    "   then: detectors/aeroblade/.venv/bin/huggingface-cli login\n"
-    "   and re-run. Delete the stale scores first so the sidecar is rewritten."
+    "   stabilityai/stable-diffusion-2-base is no longer distributed: the whole SD2 family\n"
+    "   returns 401 and cannot be obtained by logging in. Score with --expect-aes 2 and record\n"
+    "   the exclusion, or supply a substitute autoencoder explicitly -- but do not label a\n"
+    "   substitute as SD2 in the panel manifest."
 )
 DISTANCE_METRIC = "lpips_vgg_2"  # the second LPIPS layer, which the paper found best
 SEED = 1
@@ -152,6 +157,12 @@ def main():
     parser.add_argument("--recon-dir", type=Path, default=HERE / "reconstructions")
     parser.add_argument("--require-all-aes", action="store_true",
                         help="fail instead of degrading when an autoencoder needs HF credentials")
+    parser.add_argument("--expect-aes", type=int, metavar="N",
+                        help="fail unless exactly N autoencoders loaded. Pin this for an "
+                             "unattended run: --require-all-aes is now unsatisfiable (SD2 is "
+                             "withdrawn), but plain degradation would let a *second* "
+                             "autoencoder vanish without anyone noticing until the scores "
+                             "looked odd weeks later")
     parser.add_argument("--dtype", choices=["fp32", "fp16"], default="fp32",
                         help="autoencoder precision. fp16 is upstream's own choice and needs CUDA; "
                              "fp32 is the default because it is the only one that works everywhere, "
@@ -195,6 +206,12 @@ def main():
     if gated and args.require_all_aes:
         raise SystemExit(
             f"these autoencoders need Hugging Face credentials: {', '.join(gated)}\n" + AUTH_HINT
+        )
+    if args.expect_aes is not None and len(per_ae) != args.expect_aes:
+        raise SystemExit(
+            f"expected exactly {args.expect_aes} autoencoders, got {len(per_ae)}: "
+            f"{', '.join(per_ae) or 'none'}\n"
+            f"unavailable: {', '.join(gated) or 'none'}\n" + AUTH_HINT
         )
 
     # repo_id="max" in upstream's compute_distances: the best reconstruction across AEs.

@@ -69,11 +69,18 @@ PANEL = [
     # so the smaller batch is free -- it is compute-bound, not batch-bound.
     Member("dmimagedetection_progan", "dmimagedetection", ["--model", "Grag2021_progan"], batch=16),
     Member("dmimagedetection_latent", "dmimagedetection", ["--model", "Grag2021_latent"], batch=16),
-    # --require-all-aes because this run is configured to match the paper. Without a Hugging Face
-    # token for the gated stabilityai/stable-diffusion-2-base repo, run_score.py would otherwise
-    # degrade to two of three autoencoders, print a warning nobody reads at 3am, and produce a
-    # score file that looks exactly like a good one. Failing the chunk is the honest outcome.
-    Member("aeroblade", "aeroblade", ["--dtype", "fp16", "--require-all-aes"],
+    # --expect-aes 2, not --require-all-aes. AEROBLADE's paper uses three autoencoders and
+    # stabilityai/stable-diffusion-2-base is one of them, but as of 2026-09-25 the entire SD2
+    # family is withdrawn from Hugging Face: 401 from the API, 404 in a logged-in browser, while
+    # the rest of the org serves normally. There is no licence left to accept, so three is
+    # unobtainable and requiring it would just never run.
+    #
+    # Pinning the count rather than dropping the check is the point. Bare degradation would let a
+    # *second* autoencoder disappear later and still produce a plausible-looking score file;
+    # asserting exactly two turns that into a failed chunk. The score is a max over autoencoders,
+    # so scoring with a subset can only lower it -- conservative toward calling images authentic,
+    # which is the safe direction here.
+    Member("aeroblade", "aeroblade", ["--dtype", "fp16", "--expect-aes", "2"],
            chunk=2500, batch=32),
 ]
 
