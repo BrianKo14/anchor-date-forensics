@@ -32,10 +32,19 @@ HERE = Path(__file__).resolve().parent
 UPSTREAM = HERE / "aeroblade"
 sys.path.insert(0, str(HERE.parent))       # detectors/panel_io.py
 
-# aeroblade.distances builds its joblib cache with Memory(location="cache"), resolved
-# against the CWD at import time. chdir first so the cache lands here rather than wherever
-# run_all.sh happened to be invoked from.
-os.chdir(HERE)
+# aeroblade.distances builds its joblib cache with Memory(location="cache"), resolved against
+# the CWD at import time -- before argparse can run, which is why this is an environment
+# variable and not a flag.
+#
+# The cache must be steerable because it is enormous and useless here. joblib memoises the
+# distance call keyed on its inputs, but every chunk scores different images, so it never once
+# hits: it is write-only. Scoring 280,000 images wrote 106 GB into detectors/aeroblade/cache
+# and filled the lab server's root filesystem to zero bytes at 07:26 on 2026-09-26, killing the
+# run and every other user's ability to write. runner/ now points this at a per-chunk scratch
+# directory on /data that it deletes afterwards, which bounds it to one chunk.
+CACHE_ROOT = Path(os.environ.get("AEROBLADE_CACHE_ROOT") or HERE)
+CACHE_ROOT.mkdir(parents=True, exist_ok=True)
+os.chdir(CACHE_ROOT)
 
 import panel_io  # noqa: E402
 import torch  # noqa: E402
