@@ -128,6 +128,28 @@ PORT = int(os.environ.get("PANEL_PORT", 8766))   # 8765 is the downloader's
 POLL_SECONDS = 2
 
 
+_WORK_ROOT = WORK_DIR
+
+
+def scope_to_manifest(manifest_sha):
+    """Give each manifest its own work directory and job database.
+
+    Chunks are keyed by (detector, seq), and seq only means anything relative to one manifest:
+    chunk 0 of a 36,000-row stratified draw and chunk 0 of the full 355,638 are both
+    (detector, seq 0, start 0, n 2500) while covering entirely different images. Sharing state
+    between them lets one run's outputs be claimed as the other's. merge.py would catch it --
+    it checks the concatenated image_ids against the manifest, in order -- but only after
+    everything had been re-scored, and the end of an eight-hour run is a bad place to discover
+    it. Scoping by content hash makes the collision impossible instead of merely detectable,
+    and still lets the same manifest resume exactly where it stopped.
+    """
+    global WORK_DIR, STATE_DB
+    tag = manifest_sha[:12]
+    WORK_DIR = _WORK_ROOT / tag
+    STATE_DB = VAR_DIR / f"scoring-{tag}.sqlite"
+    return tag
+
+
 def ensure_dirs():
     for path in (VAR_DIR, LOG_DIR, WORK_DIR, WORK_DIR / "chunks", WORK_DIR / "scores"):
         path.mkdir(parents=True, exist_ok=True)

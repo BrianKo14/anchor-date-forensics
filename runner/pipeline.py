@@ -107,7 +107,6 @@ def main():
     parser.add_argument("--no-server", action="store_true")
     arguments = parser.parse_args()
 
-    config.ensure_dirs()
     members = [config.PANEL_BY_NAME[name] for name in arguments.detectors]
 
     # fp16 is a CUDA-only path in aeroblade's run_score.py, and it refuses rather than silently
@@ -124,6 +123,10 @@ def main():
         for member in members:
             member.chunk = max(1, arguments.limit // 2)   # at least two chunks, to exercise resume
     manifest_sha = sha256_file(arguments.manifest)
+
+    # Before ensure_dirs and before the database is opened: both depend on the scoped paths.
+    config.scope_to_manifest(manifest_sha)
+    config.ensure_dirs()
 
     print(config.describe(arguments.manifest, arguments.out_dir))
     print(f"rows       {len(manifest)}{'  (smoke)' if arguments.smoke else ''}\n")
