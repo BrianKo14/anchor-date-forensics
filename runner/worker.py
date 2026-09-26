@@ -19,18 +19,21 @@ import config
 import state as state_module
 
 
-def chunk_env(gpu):
+def chunk_env(gpu, scratch):
     """Environment for one chunk's subprocess.
 
     CUDA_VISIBLE_DEVICES rather than --device cuda:N so the child sees exactly one card and any
     bare .cuda() or "cuda" device string inside upstream code lands on the card we intended.
     Renumbering means the child always calls it cuda:0.
 
-    HF_HUB_CACHE points at /data because aeroblade's three autoencoders and univfd's CLIP backbone
-    are ~1.5 GB that would otherwise land in a home directory on the shared root filesystem.
+    The three cache variables all point at /data for one reason: every one of them defaults to
+    somewhere on the 492 GB root volume this machine shares with eighteen other home directories.
+    HF_HUB_CACHE and TORCH_HOME are ~1.5 GB of model weights. AEROBLADE_CACHE_ROOT is the one that
+    actually bit -- see score_chunk.
     """
     env = dict(os.environ)
     env["CUDA_VISIBLE_DEVICES"] = str(gpu)
+    env["AEROBLADE_CACHE_ROOT"] = str(scratch)
     env.setdefault("HF_HUB_CACHE", str(config.WORK_DIR.parent / "hf-cache"))
     env.setdefault("TORCH_HOME", str(config.WORK_DIR.parent / "torch-cache"))
     # Each worker already owns a whole GPU; letting torch also spawn 48 CPU threads for the
@@ -55,6 +58,15 @@ def score_chunk(member, chunk, gpu, out_dir, device="cuda", timeout=None):
     staging.mkdir(parents=True)
     out = staging / final.name
 
+    # Scratch for whatever the detector writes relative to its working directory -- in practice
+    # aeroblade's joblib cache, which is write-only here (every chunk scores different images, so
+    # the memo never hits) and cost 106 GB across 280,000 images before it filled the shared root
+    # filesystem. Kept out of `staging`, which gets moved into place on success; this is deleted
+    # either way.
+    scratch = config.WORK_DIR / "scratch" / member.name / f"{seq:05d}"
+    shutil.rmtree(scratch, ignore_errors=True)
+    scratch.mkdir(parents=True)
+
     command = [
         str(member.python), str(member.script),
         "--manifest", str(manifest),
@@ -66,34 +78,36 @@ def score_chunk(member, chunk, gpu, out_dir, device="cuda", timeout=None):
 
     started = time.perf_counter()
     try:
-        result = subprocess.run(
-            command, env=chunk_env(gpu), capture_output=True, text=True,
-            timeout=timeout or config.SUBPROCESS_TIMEOUT,
-        )
-    except subprocess.TimeoutExpired:
-        shutil.rmtree(staging, ignore_errors=True)
-        return False, time.perf_counter() - started, f"timed out after {timeout or config.SUBPROCESS_TIMEOUT}s"
-    elapsed = time.perf_counter() - started
+        try:
+            result = subprocess.run(
+                command, env=chunk_env(gpu, scratch), capture_output=True, text=True,
+                timeout=timeout or config.SUBPROCESS_TIMEOUT,
+            )
+        except subprocess.TimeoutExpired:
+            return (False, time.perf_counter() - started,
+                    f"timed out after {timeout or config.SUBPROCESS_TIMEOUT}s")
+        elapsed = time.perf_counter() - started
 
-    if result.returncode != 0:
-        shutil.rmtree(staging, ignore_errors=True)
-        return False, elapsed, tail(result.stderr or result.stdout)
+        if result.returncode != 0:
+            return False, elapsed, tail(result.stderr or result.stdout)
+        if not out.exists():
+            return False, elapsed, "run_score.py exited 0 but wrote no output"
 
-    if not out.exists():
-        shutil.rmtree(staging, ignore_errors=True)
-        return False, elapsed, "run_score.py exited 0 but wrote no output"
+        # A short score file still merges, and would then quietly corrupt calibration -- the same
+        # failure panel_io.load_manifest refuses to allow on the way in.
+        rows = sum(1 for _ in out.open()) - 1
+        if rows != chunk["n"]:
+            return False, elapsed, f"expected {chunk['n']} scores, got {rows}"
 
-    # A short score file still merges, and would then quietly corrupt calibration -- the same
-    # failure panel_io.load_manifest refuses to allow on the way in.
-    rows = sum(1 for _ in out.open()) - 1
-    if rows != chunk["n"]:
+        for produced in staging.iterdir():
+            produced.replace(final.parent / produced.name)
+        return (True, elapsed,
+                f"{rows} scores in {elapsed:.0f}s ({elapsed / max(rows, 1) * 1000:.0f} ms/img)")
+    finally:
+        # Both directories go on every path, including timeout and crash. The scratch one in
+        # particular: leaving it behind on failure is how a retry loop fills a disk.
         shutil.rmtree(staging, ignore_errors=True)
-        return False, elapsed, f"expected {chunk['n']} scores, got {rows}"
-
-    for produced in staging.iterdir():
-        produced.replace(final.parent / produced.name)
-    shutil.rmtree(staging, ignore_errors=True)
-    return True, elapsed, f"{rows} scores in {elapsed:.0f}s ({elapsed / max(rows, 1) * 1000:.0f} ms/img)"
+        shutil.rmtree(scratch, ignore_errors=True)
 
 
 def tail(text, lines=6, width=800):

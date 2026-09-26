@@ -118,6 +118,13 @@ YIELD_TO_OTHER_GPU_PROCS = os.environ.get("PANEL_YIELD_GPU", "1") != "0"
 # and the box idles around 4.
 LOAD_PAUSE = NPROC * 0.90
 
+# Hold when either volume drops below this. On 2026-09-26 an unbounded joblib cache in
+# detectors/aeroblade/ filled the 492 GB root volume to zero bytes at 95% through an eight-hour
+# run, which killed the run and, worse, left eighteen other people unable to write. Everything
+# large is on /data now, but a job that can exhaust a shared filesystem should stop itself rather
+# than rely on having predicted every path something writes to.
+MIN_FREE_BYTES = int(os.environ.get("PANEL_MIN_FREE_GB", 20)) * 1_000_000_000
+
 # --- run-level -------------------------------------------------------------------------------
 
 MAX_ATTEMPTS = 3          # a chunk that fails this many times is left failed for a human
