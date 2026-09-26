@@ -80,7 +80,15 @@ PANEL = [
     # asserting exactly two turns that into a failed chunk. The score is a max over autoencoders,
     # so scoring with a subset can only lower it -- conservative toward calling images authentic,
     # which is the safe direction here.
-    Member("aeroblade", "aeroblade", ["--dtype", "fp16", "--expect-aes", "2"],
+    # --recon-dir onto /data: AEROBLADE keeps every autoencoder round-trip as a PNG, and its
+    # default puts them under detectors/aeroblade/ on the 492 GB root volume shared with 18 other
+    # home directories. Measured at 58.7 KB each, that is 4.3 GB and 72,000 files for a 36k run,
+    # 43 GB and 711,000 files for the full 355,638 -- fine on /data, rude on /.
+    # The path is keyed by crop policy and dtype inside run_score.py, so fp32 and fp16
+    # reconstructions cannot be mistaken for each other.
+    Member("aeroblade", "aeroblade",
+           ["--dtype", "fp16", "--expect-aes", "2",
+            "--recon-dir", str(WORK_DIR.parent / "recon")],
            chunk=2500, batch=32),
 ]
 
