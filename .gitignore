@@ -1,0 +1,28 @@
+# --- AI ---
+CLAUDE.md
+
+# --- OS ---
+.DS_Store
+.DS_Store?
+._*
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+
+# --- Virtual environments ---
+.venv/
+venv/
+
+# --- Runner state: job databases and logs, per-machine ---
+var/
+
+# --- Secrets ---
+.env
+.env.*
+ssh_config
+config.ssh
+
+# --- Editors ---
+.vscode/
+.idea/
