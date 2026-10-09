@@ -109,6 +109,13 @@ def main():
 
     members = [config.PANEL_BY_NAME[name] for name in arguments.detectors]
 
+    # Every chunk would fail on this anyway, but one at a time and three attempts each.
+    missing = [str(path) for member in members for path in (member.python, member.script)
+               if not path.exists()]
+    if missing:
+        sys.exit("missing from the panel repo -- set PANEL_REPO to a checkout of main with the "
+                 "detector venvs installed:\n  " + "\n  ".join(missing))
+
     # fp16 is a CUDA-only path in aeroblade's run_score.py, and it refuses rather than silently
     # falling back. Rehearsing on CPU should exercise the orchestration, not die on that guard.
     if not arguments.device.startswith("cuda"):

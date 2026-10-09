@@ -15,6 +15,11 @@ from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 
+# The checkout of `main` whose detectors/ this run drives. This branch holds orchestration only;
+# the detector code, its pinned clones and its virtualenvs live there, so the panel that scores on
+# the server is byte for byte the panel that scores anywhere else.
+PANEL_REPO = Path(os.environ.get("PANEL_REPO") or Path.home() / "anchor-date-forensics")
+
 VAR_DIR = Path(os.environ.get("PANEL_VAR_DIR") or PROJECT_ROOT / "var")
 STATE_DB = VAR_DIR / "scoring.sqlite"
 LOG_DIR = VAR_DIR / "logs"
@@ -42,11 +47,11 @@ class Member:
 
     @property
     def python(self):
-        return PROJECT_ROOT / "detectors" / self.directory / ".venv" / "bin" / "python"
+        return PANEL_REPO / "detectors" / self.directory / ".venv" / "bin" / "python"
 
     @property
     def script(self):
-        return PROJECT_ROOT / "detectors" / self.directory / "run_score.py"
+        return PANEL_REPO / "detectors" / self.directory / "run_score.py"
 
     def __repr__(self):
         return f"Member({self.name})"
@@ -169,6 +174,7 @@ def ensure_dirs():
 
 def describe(manifest, out_dir):
     return "\n".join([
+        f"panel repo {PANEL_REPO}",
         f"manifest   {manifest}",
         f"outputs    {out_dir}",
         f"work       {WORK_DIR}",

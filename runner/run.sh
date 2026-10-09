@@ -30,13 +30,17 @@ mkdir -p "$LOGDIR"
 
 running() { tmux has-session -t "$SESSION" 2>/dev/null; }
 
+abspath() { case "$1" in /*) echo "$1" ;; *) echo "$PWD/$1" ;; esac; }
+
 usage() { sed -n '2,20p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'; exit 1; }
 
 case "${1:-}" in
   start|smoke)
     [[ $# -ge 3 ]] || usage
     manifest="$(cd "$(dirname "$2")" && pwd)/$(basename "$2")"
-    outdir="$3"
+    # Absolute before the `cd $HERE` below: a relative out-dir means the caller's directory, and
+    # the outputs belong in main's experiments/, not in this branch's checkout.
+    outdir="$(abspath "$3")"
     [[ -f "$manifest" ]] || { echo "no manifest at $manifest" >&2; exit 1; }
     if running; then
       echo "already running in tmux session '$SESSION' -- use 'attach' to watch it"
@@ -114,7 +118,9 @@ case "${1:-}" in
 
   merge)
     [[ $# -ge 3 ]] || usage
-    exec "$PYTHON" -m runner.pipeline --manifest "$2" --out-dir "$3" --merge-only
+    manifest="$(abspath "$2")"; outdir="$(abspath "$3")"
+    cd "$HERE"
+    exec "$PYTHON" -m runner.pipeline --manifest "$manifest" --out-dir "$outdir" --merge-only
     ;;
 
   *) usage ;;
