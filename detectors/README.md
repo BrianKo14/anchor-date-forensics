@@ -97,7 +97,7 @@ So the panel scores AEROBLADE with SD 1.1 and Kandinsky 2.1, and says so: the si
 over autoencoders, so a subset can only lower it — conservative toward calling an image
 authentic, which is the safe direction for this project's asymmetric conclusions.
 
-Pin the count on unattended runs, which is what `runner/` does:
+Pin the count on unattended runs, which is what the `server-run` branch's runner does:
 
 ```sh
 --expect-aes 2      # fail unless exactly two loaded

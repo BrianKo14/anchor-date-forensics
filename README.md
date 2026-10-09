@@ -4,6 +4,17 @@ Prototyping for a time-calibrated AI-generation detection system: given a crypto
 anchor date **T**, estimate the likelihood ratio that an image came from some image
 generator available by T.
 
+## Branches
+
+The three branches do separate jobs and share no history -- none is a fork of another.
+
+- **`main`** -- the experiments: sample importers, detector panel, `lr/`, notebooks, and the
+  score sidecars under `experiments/`.
+- **`downloader`** -- builds the full 360k AI-GenBench dataset on the lab server's `/data`.
+- **`server-run`** -- runs the detector panel over a manifest on the lab server, unattended and
+  resumable, with a dashboard for checking the run's health. It drives `main`'s
+  `detectors/*/run_score.py` from a checkout of `main` beside it, so it holds no experiment code.
+
 ## Setup
 
 Python 3.12.
