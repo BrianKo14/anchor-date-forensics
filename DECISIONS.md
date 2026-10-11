@@ -38,11 +38,73 @@ found* as the work progresses.
 - **Next:** what it implies.
 ```
 
-Numbering is continuous and never reused. Next free IDs: **D-008**, **R-002**.
+Numbering is continuous and never reused. Next free IDs: **D-010**, **R-003**.
 
 ---
 
 ## Decisions
+
+### D-009 · 2026-10-11 · Release groups, not generators, are the unit in the time tests
+- **Status:** Accepted. Supersedes D-008's holdout and permutation unit; the rest of D-008 stands.
+- **Decision:** Generators released within **7 days** of each other (single-linkage on date) form
+  one *release group*. T1 holds out a whole group, bins never split a group (members share the
+  group's earliest date), T1 is summarised over groups, and the permutation null shuffles dates
+  **among groups**. T2 drops within-group pairs and permutes at group level. Locally: GAN 13
+  generators → 12 groups (the two Diffusion-GAN variants merge); diffusion 16 → 13 (FLUX Dev +
+  Schnell; DDGAN + Glide + Latent Diffusion, 2021-12-16..21). The pre-registered server spec
+  (D-008) uses this unit.
+- **Why:** found in the first smoke test, before any primary run. FLUX Dev and FLUX Schnell (one
+  release, one day apart, same source dataset) gave the two largest log-LRs. Holding one out left
+  its near-twin in the training bin, while under the generator-level null the two almost never
+  share a bin, so the null under-represents that advantage and p is inflated. The D-008 pilot's
+  diffusion φ̄ result (bin accuracy 0.62, p≈0.02–0.05) carries this bias. With release groups the
+  same smoke test gives log-LR +0.29 vs null −0.04, p≈0.2 (40 permutations, indicative only).
+  [I] The 7-day window also merges unrelated same-week releases (DDGAN, Glide, LDM). That is
+  conservative: it costs units but cannot create a spurious effect.
+- **Consequences:** effective n drops to the number of release groups (12 GAN, 13 diffusion).
+- **Amended 2026-10-11, after the four primary specs had run once:** time bins hold an equal
+  number of **release groups**, not generators. The first full run crashed when a permuted 4-bin
+  split left one group alone in a bin. Under the generator-count rule, a 3-generator group can
+  starve a bin, which is inconsistent with groups being the unit. On the real dates, the primary
+  3-bin partition is identical for diffusion and moves one boundary generator for GAN. The
+  first-run primary numbers (generator-count bins) are recorded in R-002 next to the final ones.
+- **Refs:** `selfdesc/temporal.py` (`release_groups`, `RELEASE_WINDOW_DAYS`, `time_bins`).
+
+### D-008 · 2026-10-11 · Testing for time structure within a family: GMM per time bin, generator as the unit
+- **Status:** Accepted; holdout/permutation unit superseded by D-009 (release groups)
+- **Decision:** Whether the distribution of self-descriptions shifts over time within a family is
+  tested in `self_descriptions_time.ipynb` via `selfdesc/temporal.py`:
+  - **Unit of evidence = generator.** Time is a property of generators, so a temporal claim must
+    transfer to an *unseen* generator. Image-level CV would only re-find generator identity
+    (R-001). All p-values come from **generator-level permutations of release dates** within the
+    family (re-bin, rerun). Effective n = number of generators (GAN 13, diffusion 16 locally).
+  - **T1 (headline):** equal-generator-count time bins (ties kept together). Leave one generator
+    out, fit one GMM per bin on the rest (diag covariance, components by BIC ≤ 4, reg_covar 1e-3), score
+    the held-out generator under each bin. Statistic: mean over generators of the log-likelihood
+    ratio of the true bin vs the mean of the others (nats/image). Bin accuracy and mean |bin error|
+    are also reported.
+  - **T2:** pairwise held-out divergence between (generator × origin) cells vs |Δ release date|,
+    Spearman, same permutation null. Reported for all pairs and for same-origin pairs only.
+  - **T3/T4 (descriptive):** what each bin's GMM components contain; BIC component count per
+    generator.
+  - **Features:** full Φ and φ̄ (mean over k of φ_k). The residual channels are ~0.93 correlated,
+    so φ̄ is the well-conditioned part and φ_k − φ̄ holds the cancelling coefficients. Robust
+    scaling, then centring on **family × origin dataset** means (removes origin-level location
+    shifts), then pooled PCA on fakes, g = 10.
+  - **Primary (local):** {diffusion, GAN} × {Φ, φ̄}, 3 bins, g = 10, 1000 permutations,
+    Holm-corrected over the 4. **φ̄ was promoted after a read-only pilot on this same sample**
+    (diffusion φ̄ 0.62 bin accuracy vs null ≈0.27; GAN at null), so local p-values for φ̄ are
+    optimistic and the local run is exploratory.
+  - **Pre-registered confirmatory spec for the server run (stratified-36k, same frozen FREs):**
+    exactly the primary spec above (both families, both feature sets, family×origin centring,
+    3 bins, g = 10, T1 statistic = mean log-LR, 1000 generator-level permutations, Holm over 4),
+    plus T2 on same-origin pairs. Logged before that run; any deviation gets its own entry.
+- **Why:** user request (2026-10-11): GMM per time bin, components as clusters. Quality as an
+  alternative explanation is out of scope for now (user).
+- **Consequences:** inpainting (3 generators) and other (2) cannot be binned; descriptive only.
+  Sensitivity grid (200 permutations): bins 2/4, g 5/20, family-only centring, GAN∩Artifact, Φ blocks
+  (rings, offset parity, deviations), the 10 configs.
+- **Refs:** `selfdesc/temporal.py`, `self_descriptions_time.ipynb`.
 
 ### D-007 · 2026-10-10 · Granularity = PCA components kept after family centring
 - **Status:** Accepted
@@ -149,6 +211,47 @@ Numbering is continuous and never reused. Next free IDs: **D-008**, **R-002**.
 ---
 
 ## Results
+
+### R-002 · 2026-10-11 · Time structure within families: not demonstrated; GAN rules out large drift, diffusion weak and resolution-confounded
+- **Experiment:** `self_descriptions_time.ipynb` on `experiments/selfdesc-sample/temporal/`
+  (`python -m selfdesc.temporal --exp experiments/selfdesc-sample --perms 1000`, 1530 s; size check
+  via `--only size`, 515 s). K8_M11_B11_L3, design per D-008 as amended by D-009.
+- **Setup:** 272 diffusion images (16 generators → 13 release groups), 221 GAN (13 → 12). φ̄ and
+  full Φ; family×origin centring; g = 10; 3 equal-group time bins; diag GMMs with BIC ≤ 4; release
+  groups held out and permuted. 1000 permutations for primary, 200 grid, 100 other configs.
+- **Result:**
+  1. Primary (Holm over 4): diffusion φ̄ log-LR +0.29 vs null −0.14, p 0.096 (Holm 0.38), bin acc
+     0.46 (chance 0.33). Diffusion Φ −0.02 vs −0.12, p 0.28. GAN Φ −0.13 vs −0.12, p 0.50. GAN φ̄
+     −0.22 vs −0.18, p 0.53. **None significant.** First, crashed run with generator-count bins
+     (D-009 amendment): diffusion Φ p 0.237, φ̄ p 0.118; GAN Φ p 0.659, φ̄ p 0.606. Same conclusion.
+  2. Power (planted drift on real features, 5 directions × 99 perms): a drift of 2 within-generator
+     SDs over the date range is detected with power 0.8 (GAN) to 1.0 (diffusion); ≤ 1 SD gives
+     0–0.4.
+  3. Diffusion φ̄ excess is positive in 12/14 sensitivity settings, p ≤ 0.05 in 2 (K2; upstream
+     FRE), uncorrected, and gone with 2 bins and with B = 5. All settings reuse one sample, so this is
+     robustness to analysis choices, not replication.
+  4. **Resolution confound (diffusion):** generator native short side tracks release date
+     (Spearman 0.79; GAN 0.22). Log native size alone predicts the bin (acc 0.69, p 0.018). With
+     size regressed out (linear + quadratic), φ̄ is unchanged (+0.30, p 0.085; size R² ≈ 0.01), so
+     this is not a mean-level size shift. A spread-level size effect is not excluded.
+  5. GAN: 1/36 grid settings at p ≤ 0.05 (K2 full), about chance; GAN∩Artifact (one origin, 11
+     groups) also null.
+  6. T2 (divergence vs date gap): ρ 0.08–0.27 in all four family×feature combinations, p ≈ 0.05
+     only for diffusion φ̄ over all (origin-mixed) pairs. Same-origin pairs (6 diffusion, 22 GAN):
+     ρ ≤ 0.21, p ≥ 0.19.
+  7. Bin GMMs choose 1–2 components, aligned with neither generator (ARI ≤ 0.08) nor origin
+     (≤ 0.02). Per generator, BIC picks 1 component for 13/16 diffusion and 10/13 GAN, which is
+     uninformative at n = 17.
+  8. Variables (exploratory): in diffusion, φ̄ rings 2 (+0.64) and 3+ (+0.48) and even offsets
+     (+0.43) > ring 1 (+0.16); per-channel deviations +0.10.
+- **Plain reading:** no demonstrated within-family time signal. For GANs, a large (≥ 2 SD) drift
+  is ruled out. For diffusion, a weak, sign-consistent signal that is so far indistinguishable from
+  the rise in output resolution. Nothing supports dating an unseen generator from Φ yet.
+- **Caveats:** 17 images per generator; 12–13 release groups; φ̄ promoted after a pilot on this
+  sample (its p is optimistic); the 7-day release window merges unrelated same-week releases.
+- **Next:** the pre-registered spec (D-008/D-009) on the server's stratified-36k; a
+  resolution-controlled arm (equal-resolution generators, or a common-pixel-scale crop policy as an
+  explicitly separate departure from D-006).
 
 ### R-001 · 2026-10-10 · Forensic self-descriptions on the local sample: weak family structure, robust within-family generator structure
 - **Experiment:** `self_descriptions.ipynb` on `experiments/selfdesc-sample/` (manifest sha256

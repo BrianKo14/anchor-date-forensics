@@ -1,0 +1,25 @@
+{
+  "config": "K8_M11_B11_L3",
+  "perms": 1000,
+  "grid_perms": 200,
+  "config_perms": 100,
+  "seed": 0,
+  "primary": {
+    "centring": "family x origin",
+    "n_bins": 3,
+    "g": 10
+  },
+  "min_images": 5,
+  "min_cell": 10,
+  "release_window_days": 7,
+  "min_per_component": 5,
+  "max_components": 4,
+  "reg_covar": 0.001,
+  "covariance": "diag",
+  "n_specs": 74,
+  "quick": false,
+  "git_commit": "1d238330390f3da4f2fdcc62fb866bf6817cbc16",
+  "seconds": 1530.0,
+  "written": "2026-10-11T14:56:01+00:00",
+  "decision": "DECISIONS.md D-008"
+}

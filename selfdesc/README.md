@@ -13,7 +13,8 @@ is a per-image description, not a discriminative embedding. Analysis lives in
 | `extract.py` | CLI: Φ for every manifest row under one config → `descriptions/<config>/`; resumable shards |
 | `sweep.py` | CLI: calibrate λ, train the FREs a grid needs, extract every config |
 | `analysis.py` | notebook helpers: loading with alignment checks, scaling, family centring, PCA, separability + permutation nulls |
-| `selftest.py` | `python -m selfdesc.selftest`: each piece checked against an independent reference |
+| `temporal.py` | CLI: does Φ's distribution shift with release date within a family? GMM per time bin, release groups held out, permutation nulls, planted-drift power → `temporal/` (D-008, D-009) |
+| `selftest.py` | `python -m selfdesc.selftest`: each piece checked against an independent reference, plus T1 power and calibration on synthetic families (~1 min) |
 
 ## Run
 
@@ -21,6 +22,12 @@ is a per-image description, not a discriminative embedding. Analysis lives in
 python imports/build_manifest.py --out experiments/selfdesc-sample/manifest.csv
 python -m selfdesc.sweep --manifest experiments/selfdesc-sample/manifest.csv \
     --out experiments/selfdesc-sample --workers 10
+```
+
+Time analysis (reads the saved descriptions; `self_descriptions_time.ipynb` loads its output):
+
+```sh
+python -m selfdesc.temporal --exp experiments/selfdesc-sample --perms 1000   # ~30 min locally
 ```
 
 On the server, reuse the FREs frozen here so the two runs differ only in images:

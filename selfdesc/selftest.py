@@ -10,12 +10,18 @@
   (d) fre.train with lambda = 0 lands on the closed-form constrained predictor, and every filter
       keeps a zero centre and unit sum;
   (e) the diversity term does its job: lambda = 0 collapses K filters onto one (minor singular
-      values ~ 0), lambda > 0 does not.
+      values ~ 0), lambda > 0 does not;
+  (f) temporal.t1_test has power: a synthetic family whose generator means drift with release date
+      is attributed to the right time bins far above the permutation null;
+  (g) temporal.t1_test is calibrated: with no drift, p <= 0.05 occurs at about the nominal rate
+      over repeated draws (the permutation null is exact for exchangeable dates).
 """
 
 import numpy as np
 
-from . import core, fre
+import pandas as pd
+
+from . import core, fre, temporal
 
 __all__ = ["run"]
 
@@ -59,6 +65,19 @@ def _brute_force_fit(maps, B):
     yr = np.concatenate([y, np.zeros(K * n_feat)])
     z = np.linalg.lstsq(Xr @ N, yr - Xr @ phi0, rcond=None)[0]
     return phi0 + N @ z
+
+
+def _synthetic_family(rng, drift, n_gen=9, per_gen=12, dim=3):
+    """A one-family index + features: generator means = drift * (date scaled to 0..1) + jitter."""
+    dates = pd.to_datetime("2018-01-01") + pd.to_timedelta(np.arange(n_gen) * 120, unit="D")
+    rows, feats = [], []
+    for g, d in enumerate(dates):
+        t = g / (n_gen - 1)
+        mu = drift * t * np.eye(dim)[0] + 0.3 * rng.normal(size=dim)
+        feats.append(mu + rng.normal(size=(per_gen, dim)))
+        rows += [dict(generator=f"g{g}", generator_family="fam", origin_dataset="o",
+                      release_date=d, label=1)] * per_gen
+    return pd.DataFrame(rows), np.vstack(feats)
 
 
 def run(seed=0):
@@ -120,6 +139,25 @@ def run(seed=0):
     minor1 = min(info1["singular_values"][1:])
     assert minor0 < 1e-4 and minor1 > 100 * minor0, (minor0, minor1)
     lines.append(f"(e) diversity: minor sv {minor0:.1e} (lambda=0) -> {minor1:.3f} (lambda=1)")
+
+    # (f)
+    # sized like the real families (13 release groups x 17 images, g = 10)
+    index, P = _synthetic_family(rng, drift=4.0, n_gen=13, per_gen=17, dim=10)
+    s, _, _ = temporal.t1_test(P, index, "fam", n_bins=3, perms=99, seed=seed)
+    assert s["p_llr"] <= 0.05, s
+    lines.append(f"(f) T1 power, drift: llr {s['llr']:+.2f} vs null {s['null_llr_mean']:+.2f}, "
+                 f"p = {s['p_llr']:.2f}")
+
+    # (g)
+    draws, hits = 20, 0
+    for i in range(draws):
+        index, P = _synthetic_family(np.random.default_rng([seed, 100 + i]), drift=0.0)
+        s, _, _ = temporal.t1_test(P, index, "fam", n_bins=3, perms=49, seed=i)
+        hits += s["p_llr"] <= 0.05
+    # Binomial(20, 0.05): P(X >= 5) ~ 0.003, so >= 5 rejections means the test is anticonservative
+    assert hits <= 4, f"{hits}/{draws} null draws rejected at 0.05"
+    lines.append(f"(g) T1 calibration, no drift: {hits}/{draws} rejections at p <= 0.05 "
+                 f"(expected ~1)")
 
     print("\n".join(lines))
     print("selfdesc selftest: all checks passed")
