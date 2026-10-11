@@ -1,0 +1,11 @@
+{
+  "target_mean_minor_sv": 0.9505200000000001,
+  "achieved_mean_minor_sv": 0.9506827923547474,
+  "lambda": 52.159291438055284,
+  "calibrated_on": "K=8, M=15, our authentic train crops",
+  "target": "fre.UPSTREAM_SINGULAR_VALUES (mean of minor values)",
+  "upstream_sha256": "d95b9c50837dbf7b660bbefa20cdaa5db5e59601a9d6544573c10e78e04906bb",
+  "training_images": 306,
+  "training_windows": 10586376,
+  "manifest": "experiments/selfdesc-sample/manifest.csv"
+}

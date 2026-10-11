@@ -1,0 +1,57 @@
+{
+  "config": "K2_M11_B11_L3",
+  "K": 2,
+  "M": 11,
+  "B": 11,
+  "L": 3,
+  "fre_sha256": "4363245de3869df54fffb3f57ec65c7668e80fefc939526fb8f27072c7f6c2a4",
+  "manifest_sha256": "4b7dca1c96b224391e51d254ad7fb67e4ce7b06338ee8c7142b2fffc749e1af6",
+  "limit": null,
+  "rows": 1224,
+  "shard_size": 31,
+  "crop_policy": "crop200_align16",
+  "dim": 240,
+  "fre_file": "experiments/selfdesc-sample/fre/fre_K2_M11.npz",
+  "fre_meta": {
+    "K": 2,
+    "M": 11,
+    "lambda": 52.159291438055284,
+    "alpha": 0.001,
+    "seed": 0,
+    "optimizer": "L-BFGS-B, whitened sum-zero coordinates",
+    "iterations": 35,
+    "grad_norm_whitened": 2.241819871592962e-06,
+    "converged": true,
+    "optimizer_message": "ABNORMAL: ",
+    "energy_per_filter": [
+      122.3174037446588,
+      122.3169865817581
+    ],
+    "diversity": -0.43953616804692125,
+    "loss": 221.7084952396915,
+    "singular_values": [
+      1.6294785245223555,
+      0.9508599398561367
+    ],
+    "trained_on": "authentic rows with split == 'train' (real images only)",
+    "training_images": 306,
+    "training_windows": 11046600,
+    "training_ids_sha256": "5a3d9b7fd66e5c17a6b65d88590c264cd18c944d5f23f9ee39879fc6102210da",
+    "manifest": "experiments/selfdesc-sample/manifest.csv",
+    "manifest_sha256": "4b7dca1c96b224391e51d254ad7fb67e4ce7b06338ee8c7142b2fffc749e1af6",
+    "pixels": "PIL 'L' luma, 0..255, of the crop_policy crops",
+    "sha256": "4363245de3869df54fffb3f57ec65c7668e80fefc939526fb8f27072c7f6c2a4"
+  },
+  "manifest": "experiments/selfdesc-sample/manifest.csv",
+  "ridge": 1e-05,
+  "upstream_reference": "github.com/ductai199x/Forensic-Self-Descriptions-CVPR25@50f2eae",
+  "deviations": [
+    "no resize to 1024: input is the native-pixel crop (crop_policy)",
+    "lambda calibrated to the released FRE's spectral diversity (fre.py)"
+  ],
+  "git_commit": "b6ee0fe34f5caedad4cbe125ca0506a2e03fc262",
+  "workers": 10,
+  "seconds_this_run": 59.4,
+  "numpy": "2.5.2",
+  "written": "2026-10-10T04:10:30+00:00"
+}

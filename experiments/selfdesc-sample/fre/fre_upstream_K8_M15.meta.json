@@ -1,0 +1,18 @@
+{
+  "K": 8,
+  "M": 15,
+  "source": "https://github.com/ductai199x/Forensic-Self-Descriptions-CVPR25/releases/download/v1.2.0/fre.pt",
+  "source_sha256": "d95b9c50837dbf7b660bbefa20cdaa5db5e59601a9d6544573c10e78e04906bb",
+  "license": "CC BY-NC-SA 4.0 (upstream); not redistributed, fetched on demand",
+  "singular_values": [
+    2.6369094086310736,
+    0.996042961998243,
+    0.9942930842797977,
+    0.9918304848589978,
+    0.949459689786207,
+    0.9388939820029587,
+    0.8932237714629813,
+    0.8898960268115279
+  ],
+  "sha256": "74f5fc7264fc54a03c542046c38951ce0bd74cf830d51354b18a83172d56dc35"
+}

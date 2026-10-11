@@ -1,0 +1,45 @@
+{
+  "config": "upstream_K8_M15_B11_L3",
+  "K": 8,
+  "M": 15,
+  "B": 11,
+  "L": 3,
+  "fre_sha256": "74f5fc7264fc54a03c542046c38951ce0bd74cf830d51354b18a83172d56dc35",
+  "manifest_sha256": "4b7dca1c96b224391e51d254ad7fb67e4ce7b06338ee8c7142b2fffc749e1af6",
+  "limit": null,
+  "rows": 1224,
+  "shard_size": 31,
+  "crop_policy": "crop200_align16",
+  "dim": 960,
+  "fre_file": "experiments/selfdesc-sample/fre/fre_upstream_K8_M15.npz",
+  "fre_meta": {
+    "K": 8,
+    "M": 15,
+    "source": "https://github.com/ductai199x/Forensic-Self-Descriptions-CVPR25/releases/download/v1.2.0/fre.pt",
+    "source_sha256": "d95b9c50837dbf7b660bbefa20cdaa5db5e59601a9d6544573c10e78e04906bb",
+    "license": "CC BY-NC-SA 4.0 (upstream); not redistributed, fetched on demand",
+    "singular_values": [
+      2.6369094086310736,
+      0.996042961998243,
+      0.9942930842797977,
+      0.9918304848589978,
+      0.949459689786207,
+      0.9388939820029587,
+      0.8932237714629813,
+      0.8898960268115279
+    ],
+    "sha256": "74f5fc7264fc54a03c542046c38951ce0bd74cf830d51354b18a83172d56dc35"
+  },
+  "manifest": "experiments/selfdesc-sample/manifest.csv",
+  "ridge": 1e-05,
+  "upstream_reference": "github.com/ductai199x/Forensic-Self-Descriptions-CVPR25@50f2eae",
+  "deviations": [
+    "no resize to 1024: input is the native-pixel crop (crop_policy)",
+    "lambda calibrated to the released FRE's spectral diversity (fre.py)"
+  ],
+  "git_commit": "b6ee0fe34f5caedad4cbe125ca0506a2e03fc262",
+  "workers": 10,
+  "seconds_this_run": 452.2,
+  "numpy": "2.5.2",
+  "written": "2026-10-10T05:25:27+00:00"
+}

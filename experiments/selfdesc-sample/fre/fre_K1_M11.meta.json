@@ -1,0 +1,28 @@
+{
+  "K": 1,
+  "M": 11,
+  "lambda": 52.159291438055284,
+  "alpha": 0.001,
+  "seed": 0,
+  "optimizer": "L-BFGS-B, whitened sum-zero coordinates",
+  "iterations": 12,
+  "grad_norm_whitened": 3.917756130235476e-06,
+  "converged": true,
+  "optimizer_message": "ABNORMAL: ",
+  "energy_per_filter": [
+    114.9853087345291
+  ],
+  "diversity": -0.28971415995053235,
+  "loss": 99.87402343193791,
+  "singular_values": [
+    1.335045538117076
+  ],
+  "trained_on": "authentic rows with split == 'train' (real images only)",
+  "training_images": 306,
+  "training_windows": 11046600,
+  "training_ids_sha256": "5a3d9b7fd66e5c17a6b65d88590c264cd18c944d5f23f9ee39879fc6102210da",
+  "manifest": "experiments/selfdesc-sample/manifest.csv",
+  "manifest_sha256": "4b7dca1c96b224391e51d254ad7fb67e4ce7b06338ee8c7142b2fffc749e1af6",
+  "pixels": "PIL 'L' luma, 0..255, of the crop_policy crops",
+  "sha256": "f58c866902ba39b6ab45107f4c361f515a771c93cd40cde9e993b68406bd50d4"
+}

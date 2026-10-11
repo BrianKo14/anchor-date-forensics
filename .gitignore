@@ -15,6 +15,7 @@ detectors/aeroblade/cache/
 
 # --- AI ---
 CLAUDE.md
+DECISIONS.md
 
 
 
@@ -118,3 +119,7 @@ experiments/*/manifest.csv
 experiments/*/scores/*.csv
 !experiments/*/*.meta.json
 !experiments/*/scores/*.meta.json
+# Self-description FREs (selfdesc/) are the frozen residual extractors every description depends
+# on -- a few KB each, so tracked, like the score sidecars. The authors' released FRE is not
+# redistributed (CC BY-NC-SA); fre.fetch_upstream re-downloads and hash-checks it.
+!experiments/*/fre/fre_K*_M*.npz
