@@ -149,11 +149,18 @@ POLL_SECONDS = 2
 # main's own interpreter: selfdesc needs only numpy/scipy/sklearn/pandas, all in main's .venv.
 MAIN_PYTHON = PANEL_REPO / ".venv" / "bin" / "python"
 
-# Upper bound on concurrent single-threaded extraction subprocesses (and temporal's joblib
-# workers). 40 of 48 by agreement with Brian (2026-10-11); the governor lowers it live whenever
-# other users' load rises, and HEADROOM cores are never taken.
-SELFDESC_WORKERS = int(os.environ.get("SELFDESC_WORKERS", 40))
+# Upper bound on concurrent single-threaded extraction subprocesses. Up to 40 of 48 was agreed
+# with Brian (2026-10-11), but 12 is the measured optimum (below); the governor lowers it live
+# whenever other users' load rises, and HEADROOM cores are never taken.
+SELFDESC_WORKERS = int(os.environ.get("SELFDESC_WORKERS", 12))
 SELFDESC_HEADROOM = 4
+# The temporal stage is one subprocess whose joblib workers fit small GMMs (a few thousand rows x
+# 10 dims, cache-resident), so it scales where extraction does not. Measured 2026-10-13 on this
+# box: K8 extraction peaks at ~12 concurrent processes (3.05 img/s) and *drops* beyond (2.10 at
+# 24, 1.68 at 36): each fit streams hundreds of MB of temporaries, and the processes then
+# contend for cache and memory, not cores. Hence SELFDESC_WORKERS=12 for extraction, and a
+# separate, larger allowance here.
+SELFDESC_TEMPORAL_JOBS = int(os.environ.get("SELFDESC_TEMPORAL_JOBS", 24))
 NICE = 10   # every subprocess runs under nice: a colleague's interactive work wins every tie
 
 # Rows per shard. One shard is one subprocess, so this trades process start-up (~1 s) against

@@ -320,7 +320,10 @@ def temporal(state, gov, stop, job, perms):
 
 def temporal_one(state, gov, stop, job, perms, name):
     """The time tests over one config's descriptions, streamed into the event log."""
-    jobs = max(1, min(config.SELFDESC_WORKERS, gov.allowed() or 1))
+    gov.refresh(force=True)
+    others = max(0.0, gov._load - gov.running)
+    jobs = int(max(1, min(config.SELFDESC_TEMPORAL_JOBS,
+                          config.NPROC - config.SELFDESC_HEADROOM - others)))
     args = ["selfdesc.temporal", "--exp", job.out_dir, "--config", name, "--suite", job.suite,
             "--perms", perms, "--jobs", jobs]
     if job.smoke:
