@@ -29,8 +29,8 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
+from . import core, fre
 from . import extract as ex
-from . import fre
 
 PAPER = {"K": 8, "M": 11, "B": 11, "L": 3}
 DEFAULT_GRID = (
@@ -47,10 +47,13 @@ def training_paths(manifest):
     return real["image_id"].tolist(), [ex.PROJECT_ROOT / p for p in real["crop_path"]]
 
 
-def ensure_lambda(fre_dir, manifest, manifest_path):
+def ensure_lambda(fre_dir, manifest, manifest_path, frozen=False):
     path = fre_dir / "lambda.json"
     if path.exists():
         return json.loads(path.read_text())["lambda"]
+    if frozen:
+        raise SystemExit(f"--frozen: no {path}; point --fre-dir at the frozen FREs "
+                         f"(experiments/selfdesc-sample/fre) instead of calibrating anew")
     ids, paths = training_paths(manifest)
     R15, windows = fre.second_moments(paths, 15)
     lam, info = fre.calibrate_lambda(R15)
@@ -65,10 +68,14 @@ def ensure_lambda(fre_dir, manifest, manifest_path):
     return lam
 
 
-def ensure_fre(fre_dir, K, M, lam, manifest, manifest_path, moments_cache):
+def ensure_fre(fre_dir, K, M, lam, manifest, manifest_path, moments_cache, frozen=False):
     path = fre_dir / f"{fre.fre_name(K, M)}.npz"
     if path.exists():
         return path
+    if frozen:
+        # On the server, training here would silently learn the FRE from a different set of
+        # real images than the local run's, and the two runs would no longer be comparable.
+        raise SystemExit(f"--frozen: {path} is missing, refusing to train a new FRE")
     ids, paths = training_paths(manifest)
     if M not in moments_cache:
         moments_cache[M] = fre.second_moments(paths, M)
@@ -98,6 +105,16 @@ def main():
     parser.add_argument("--no-upstream", action="store_true",
                         help="skip the authors' released FRE (needs network to fetch)")
     parser.add_argument("--limit", type=int, default=None, help="first N rows only (smoke test)")
+    parser.add_argument("--channels", nargs="+", choices=sorted(core.CHANNELS), default=["luma"],
+                        help="planes to describe; each grid config is run once per entry, "
+                             "'rgb' configs get an _rgb suffix (DECISIONS.md D-011)")
+    parser.add_argument("--frozen", action="store_true",
+                        help="never calibrate lambda or train an FRE: every one must already be "
+                             "in --fre-dir (the server run reuses the local, frozen FREs)")
+    parser.add_argument("--plan-json", type=Path, default=None, metavar="PATH",
+                        help="prepare only: write images.parquet, make sure every FRE exists, "
+                             "write the job list to PATH and exit without extracting (the "
+                             "server-run branch's runner/selfdesc.py drives extraction itself)")
     args = parser.parse_args()
 
     fre_dir = args.fre_dir or args.out / "fre"
@@ -105,7 +122,7 @@ def main():
     ex.write_image_index(args.manifest, args.out, args.limit)
 
     grid = DEFAULT_GRID + ([] if args.no_upstream else [UPSTREAM])
-    lam = ensure_lambda(fre_dir, manifest, args.manifest)
+    lam = ensure_lambda(fre_dir, manifest, args.manifest, args.frozen)
     moments = {}
     jobs = []
     for cfg in grid:
@@ -114,13 +131,27 @@ def main():
             if not path.exists():
                 path = fre.fetch_upstream(fre_dir)
         else:
-            path = ensure_fre(fre_dir, cfg["K"], cfg["M"], lam, manifest, args.manifest, moments)
-        cid = ex.config_id(path, cfg["B"], cfg["L"])
-        if args.only is None or cid in args.only:
-            jobs.append((path, cfg["B"], cfg["L"]))
+            path = ensure_fre(fre_dir, cfg["K"], cfg["M"], lam, manifest, args.manifest, moments,
+                              args.frozen)
+        for channels in args.channels:
+            cid = ex.config_id(path, cfg["B"], cfg["L"], channels)
+            if args.only is None or cid in args.only:
+                jobs.append((path, cfg["B"], cfg["L"], channels))
 
-    for path, B, L in jobs:
-        ex.extract(args.manifest, path, B, L, args.out, args.workers, args.limit)
+    if args.plan_json is not None:
+        plan = [{"config": ex.config_id(path, B, L, channels), "fre": str(Path(path).resolve()),
+                 "fre_sha256": fre.load(path)[1], "B": B, "L": L, "channels": channels,
+                 "dim": core.CHANNELS[channels] * core.description_dim(fre.load(path)[0].shape[0],
+                                                                       B)}
+                for path, B, L, channels in jobs]
+        args.plan_json.parent.mkdir(parents=True, exist_ok=True)
+        args.plan_json.write_text(json.dumps(plan, indent=2) + "\n")
+        print(f"planned {len(plan)} config(s) -> {args.plan_json}")
+        return
+
+    for path, B, L, channels in jobs:
+        ex.extract(args.manifest, path, B, L, args.out, args.workers, args.limit,
+                   channels=channels)
 
 
 if __name__ == "__main__":

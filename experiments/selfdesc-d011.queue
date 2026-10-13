@@ -1,0 +1,20 @@
+# Self-description runs on the lab server, DECISIONS.md D-010 + D-011, in priority order.
+# Paths are relative to this file (main's experiments/). From the server-run checkout:
+#
+#   ./runner/run.sh selfdesc queue-smoke ~/anchor-date-forensics/experiments/selfdesc-d011.queue
+#   ./runner/run.sh selfdesc queue       ~/anchor-date-forensics/experiments/selfdesc-d011.queue
+#
+# Runs 2-3 need the arms manifests and native crops first (imports/native_crop_cache.py, see
+# selfdesc/README.md). Every run resumes; restarting the queue skips what is finished.
+
+# 1. The pre-registered confirmatory test (D-008/D-009) and the D-011 diagnostics on the 36k
+#    stratified draw: K8 only, so these results exist before anything else is extracted.
+stratified-36k/manifest.csv selfdesc-36k --configs K8_M11_B11_L3 --suite full
+
+# 2-3. Pipeline arms, 200 fakes per generator, same rows in both: the panel's q95 crops vs
+#      crops cut from the published source bytes; luma (upstream) vs R, G, B described apart.
+selfdesc-arms-q95/manifest.csv selfdesc-arms-q95 --configs K8_M11_B11_L3 K8_M11_B11_L3_rgb --channels luma rgb --temporal-configs K8_M11_B11_L3 K8_M11_B11_L3_rgb --suite arms
+selfdesc-arms-native/manifest.csv selfdesc-arms-native --configs K8_M11_B11_L3 K8_M11_B11_L3_rgb --channels luma rgb --temporal-configs K8_M11_B11_L3 K8_M11_B11_L3_rgb --suite arms
+
+# The rest of D-006's config grid on the 36k draw is deferred (D-011): none of the five
+# questions needs it. To add it later, append a run with --configs K1_M11_B11_L3 ... --suite full.

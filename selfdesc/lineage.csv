@@ -1,0 +1,30 @@
+generator,family,stage,stage_detail,codebase,evidence,note
+CycleGAN,gan,transposed-conv,ResNet generator; fractionally-strided convs up,i2i-resnet,R,
+StarGAN,gan,transposed-conv,CycleGAN-style ResNet generator; transposed convs up,i2i-resnet,R,
+ProGAN,gan,upsample-conv,nearest-neighbour upsample + conv,progan,R,
+StyleGAN1,gan,upsample-conv,upsample + blur + conv (ProGAN synthesis net with style modulation),progan,R,
+BigGAN,gan,upsample-conv,nearest-neighbour upsample inside residual blocks,biggan,R,
+GauGAN,gan,upsample-conv,nearest-neighbour upsample + SPADE residual blocks,spade,R,
+StyleGAN2,gan,transposed-conv,modulated transposed conv + FIR low-pass,stylegan2,R,
+GANformer,gan,transposed-conv,StyleGAN2 synthesis network with attention layers,stylegan2,R,built on the StyleGAN2 code
+Diffusion GAN (StyleGAN2),gan,transposed-conv,StyleGAN2 generator,stylegan2,R,name states the backbone
+StyleGAN3,gan,alias-free,windowed-sinc filtered up/downsampling,stylegan2,R,built on StyleGAN2-ADA code; output stage redesigned
+CIPS,gan,no-upsampling,per-pixel MLP on Fourier coordinates,cips,R,
+ProjectedGAN,gan,upsample-conv,FastGAN generator (nearest upsample + conv),fastgan,R,
+Diffusion GAN (ProjectedGAN),gan,upsample-conv,FastGAN generator via ProjectedGAN,fastgan,R,name states the backbone
+DDPM,diffusion,pixel,pixel-space U-Net,ddpm-unet,R,
+ADM,diffusion,pixel,pixel-space U-Net (guided diffusion),ddpm-unet,R,
+Palette,diffusion,pixel,pixel-space U-Net (image-to-image),ddpm-unet,R,
+Glide,diffusion,pixel,pixel cascade 64 -> 256,ddpm-unet,R,
+Denoising Diffusion GAN,diffusion,pixel,pixel-space NCSN++ generator,ncsnpp,R,
+DeepFloyd IF,diffusion,pixel,pixel cascade 64 -> 256 -> 1024,deepfloyd,R,
+VQ-Diffusion,diffusion,latent,VQ-VAE (VQGAN-style) decoder,vq-diffusion,R,
+Latent Diffusion,diffusion,latent,KL-f8 autoencoder (4 channels),compvis-ldm,S,txt2img-1p4B-eval.yaml: AutoencoderKL embed_dim 4 ch_mult [1 2 4 4]; which LDM checkpoints the origin datasets used is not checked
+Stable Diffusion 1.4,diffusion,latent,KL-f8 autoencoder (4 channels),compvis-ldm,R,
+Stable Diffusion 1.5,diffusion,latent,KL-f8 autoencoder (4 channels),compvis-ldm,R,
+Stable Diffusion 2.1,diffusion,latent,KL-f8 autoencoder (4 channels),compvis-ldm,R,
+Stable Diffusion XL 1.0,diffusion,latent,KL-f8 autoencoder (4 channels; retrained weights),compvis-ldm,R,
+FLUX 1 Dev,diffusion,latent,16-channel f8 autoencoder,flux,R,
+FLUX 1 Schnell,diffusion,latent,16-channel f8 autoencoder,flux,R,
+Midjourney,diffusion,unknown,proprietary,unknown,?,
+DALL-E 3,diffusion,unknown,proprietary; OpenAI's released consistency decoder targets SD VAE latents but its use in DALL-E 3 is not documented there,unknown,?,github.com/openai/consistencydecoder read 2026-10-13

@@ -30,7 +30,8 @@ import numpy as np
 from numpy.lib.stride_tricks import sliding_window_view
 from PIL import Image
 
-__all__ = ["load_gray", "residuals", "downsample", "fit", "describe", "description_dim"]
+__all__ = ["load_gray", "load_channels", "CHANNELS", "residuals", "downsample", "fit", "describe",
+           "description_dim"]
 
 RIDGE = 1e-5          # upstream's lambda_reg: Tikhonov term on X^T X, for numerical stability
 CHUNK_ROWS = 8192     # rows of the design matrix materialised at once
@@ -40,6 +41,24 @@ def load_gray(path):
     """The crop as float64 luma in 0..255 -- PIL's "L" (ITU-R 601), as upstream converts."""
     with Image.open(path) as image:
         return np.asarray(image.convert("L"), dtype=np.float64)
+
+
+# What `describe` is run on. "luma" is upstream's (one PIL "L" plane). "rgb" describes R, G and B
+# separately with the same luma-trained FRE and concatenates the three Phis, channel-major: a
+# departure from the paper (DECISIONS.md D-011), there to see whether the colour planes carry
+# generator or time information that luma averages away.
+CHANNELS = {"luma": 1, "rgb": 3}
+
+
+def load_channels(path, channels="luma"):
+    """The planes `describe` is run on, each float64 in 0..255: [luma] or [R, G, B]."""
+    if channels == "luma":
+        return [load_gray(path)]
+    if channels == "rgb":
+        with Image.open(path) as image:
+            rgb = np.asarray(image.convert("RGB"), dtype=np.float64)
+        return [rgb[..., c] for c in range(3)]
+    raise ValueError(channels)
 
 
 def residuals(gray, filters):

@@ -13,7 +13,8 @@ is a per-image description, not a discriminative embedding. Analysis lives in
 | `extract.py` | CLI: Φ for every manifest row under one config → `descriptions/<config>/`; resumable shards |
 | `sweep.py` | CLI: calibrate λ, train the FREs a grid needs, extract every config |
 | `analysis.py` | notebook helpers: loading with alignment checks, scaling, family centring, PCA, separability + permutation nulls |
-| `temporal.py` | CLI: does Φ's distribution shift with release date within a family? GMM per time bin, release groups held out, permutation nulls, planted-drift power → `temporal/` (D-008, D-009) |
+| `temporal.py` | CLI: does Φ's distribution shift with release date within a family? GMM per time bin, release groups held out, permutation nulls, planted-drift power → `temporal/` (D-008, D-009); plus the diagnostics for why not: lineage (L1/L2), linear drift + groups needed (T5), origin and size-band subsets, separability for the pipeline arms (S1) (D-011) |
+| `lineage.csv` | each generator's output stage (upsampler / decoder) and codebase, with evidence tags; fixed before any server result (D-011) |
 | `selftest.py` | `python -m selfdesc.selftest`: each piece checked against an independent reference, plus T1 power and calibration on synthetic families (~1 min) |
 
 ## Run
@@ -30,7 +31,29 @@ Time analysis (reads the saved descriptions; `self_descriptions_time.ipynb` load
 python -m selfdesc.temporal --exp experiments/selfdesc-sample --perms 1000   # ~30 min locally
 ```
 
-On the server, reuse the FREs frozen here so the two runs differ only in images:
+`--suite full` (default) is everything; `--suite arms` is the lighter set for the pipeline arms;
+`--suite quick` is the four primary specs only. A config other than `K8_M11_B11_L3` writes to
+`temporal_<config>/`.
+
+### Pipeline arms (D-011)
+
+Does the input pipeline hide the signal? The same 200 fakes per generator, described from the
+panel's q95 crops and from crops cut out of the published source bytes (no JPEG re-encode), each
+in luma and in RGB (`--channels luma rgb`: Φ per colour plane with the luma FRE, config id suffix
+`_rgb`). On the server, where the AI-GenBench parquet shards are kept:
+
+```sh
+python imports/native_crop_cache.py --manifest experiments/stratified-36k/manifest.csv \
+    --per-generator 200 --q95-out experiments/selfdesc-arms-q95/manifest.csv \
+    --native-out experiments/selfdesc-arms-native/manifest.csv --workers 12
+```
+
+On the server, run it through the `server-run` branch's runner (`./runner/run.sh selfdesc start
+<manifest> <out-dir>`, or every run of `experiments/selfdesc-d011.queue` back to back with
+`./runner/run.sh selfdesc queue <file>`; see that branch's README). It drives `extract.py --shard/--assemble`
+and `temporal.py` stage by stage, yields CPU to other users and resumes after any stop, and
+passes `--frozen`, so the FREs below are reused and never retrained. Without the runner,
+reuse the FREs frozen here so the two runs differ only in images:
 
 ```sh
 python -m selfdesc.sweep --manifest experiments/stratified-36k/manifest.csv \
@@ -38,7 +61,8 @@ python -m selfdesc.sweep --manifest experiments/stratified-36k/manifest.csv \
 ```
 
 Throughput (fp64, one BLAS thread per worker): ~1.2 images/s at K=8, B=11, L=3 across the M5's
-10 cores; cost grows with (K·(B²−1))², so K=16 is ~4× slower. CPU, not GPU: the 3080s are slow
+10 cores; 2.8 s/image on one core of the server's Xeons (9.3 s at K=16); cost grows with
+(K·(B²−1))², so K=16 is ~3–4× slower. RGB is 3× luma. CPU, not GPU: the 3080s are slow
 at fp64, and upstream insists on fp64 because the solve amplifies float32/TF32 drift.
 
 ## Grid
@@ -54,7 +78,7 @@ images.parquet                         one row per image, shared by every config
                                        release_date, origin_dataset, split, native size, source_format
                                        (+ its basis), stored_format, crop box, crop_policy
 fre/fre_K{K}_M{M}.npz + .meta.json     frozen FREs (tracked in git) + how they were trained; lambda.json
-descriptions/<config>/descriptions.npz X (n, K·(B²−1)) float32, image_id
+descriptions/<config>/descriptions.npz X (n, K·(B²−1)) float32 (×3, channel-major, for _rgb), image_id
 descriptions/<config>/diagnostics.parquet  per-image ‖Φ‖, model error, residual energy per k
 descriptions/<config>/meta.json        config, FRE + manifest hashes, crop policy, commit, timing
 ```

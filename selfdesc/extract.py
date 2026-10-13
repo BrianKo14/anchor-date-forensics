@@ -41,11 +41,18 @@ sys.path.insert(0, str(PROJECT_ROOT / "imports" / "sample"))
 
 import common  # noqa: E402
 
-__all__ = ["config_id", "image_index", "extract", "file_sha256"]
+__all__ = ["config_id", "image_index", "extract", "file_sha256", "write_image_index"]
 
 # Every image in the sample went through imaging.prepare_image: decoded, alpha-composited onto
-# white, re-encoded as JPEG q95. That is the file the crop was cut from.
+# white, re-encoded as JPEG q95. That is the file a crop200_align16 crop was cut from. A
+# native_* crop (imports/native_crop_cache.py) skips the re-encode: same decode and composite,
+# cut straight from the source bytes.
 STORED_FORMAT = f"JPEG q{common.JPEG_QUALITY} (imaging.prepare_image)"
+NATIVE_STORED_FORMAT = "source as published, decoded + alpha onto white, no re-encode"
+
+
+def stored_format(policy):
+    return NATIVE_STORED_FORMAT if policy.startswith("native_") else STORED_FORMAT
 
 # The authentic importers do not record a source container. Filled only where the source fixes
 # it: COCO ships JPEG; the RAISE importer downloads the TIFF column of RAISE_urls.csv. LAION is
@@ -54,9 +61,10 @@ AUTHENTIC_SOURCE_FORMAT = {"COCO2017": "JPEG", "COCO2017_train": "JPEG", "COCO20
                            "RAISE": "TIFF"}
 
 
-def config_id(fre_path, B, L):
-    """fre_K8_M11.npz + B=11, L=3 -> "K8_M11_B11_L3"."""
-    return f"{Path(fre_path).stem.removeprefix('fre_')}_B{B}_L{L}"
+def config_id(fre_path, B, L, channels="luma"):
+    """fre_K8_M11.npz + B=11, L=3 -> "K8_M11_B11_L3"; with channels="rgb", "K8_M11_B11_L3_rgb"."""
+    suffix = "" if channels == "luma" else f"_{channels}"
+    return f"{Path(fre_path).stem.removeprefix('fre_')}_B{B}_L{L}{suffix}"
 
 
 def file_sha256(path):
@@ -128,8 +136,8 @@ def image_index(manifest):
     index["source_format_basis"] = np.select([recorded, fill], ["importer", "origin_dataset"],
                                              "unknown")
     index["source_format"] = index["source_format"].fillna("unknown")
-    index["stored_format"] = STORED_FORMAT
     index["crop_policy"] = crop_policy(manifest)
+    index["stored_format"] = stored_format(index["crop_policy"].iloc[0])
     index["release_date"] = pd.to_datetime(index["release_date"], errors="coerce")
     return index
 
@@ -138,19 +146,22 @@ def image_index(manifest):
 
 def _describe_shard(args):
     """Describe one shard's rows and write the shard atomically. Runs in a worker process."""
-    shard_path, rows, fre_path, B, L = args
+    shard_path, rows, fre_path, B, L, channels = args
     filters, _ = fre.load(fre_path)
     K = filters.shape[0]
-    X = np.empty((len(rows), core.description_dim(K, B)), dtype=np.float32)
-    energy = np.empty((len(rows), K))
+    C = core.CHANNELS[channels]
+    X = np.empty((len(rows), C * core.description_dim(K, B)), dtype=np.float32)
+    energy = np.empty((len(rows), C * K))
     fit_mse = np.empty(len(rows))
     phi_norm = np.empty(len(rows))
     for i, (_, crop_path) in enumerate(rows):
-        phi, diag = core.describe(core.load_gray(PROJECT_ROOT / crop_path), filters, B, L)
-        X[i] = phi
-        energy[i] = diag["residual_energy"]
-        fit_mse[i] = diag["fit_mse"]
-        phi_norm[i] = diag["phi_norm"]
+        # one Phi per plane, channel-major; the diagnostics pool the planes
+        fits = [core.describe(plane, filters, B, L)
+                for plane in core.load_channels(PROJECT_ROOT / crop_path, channels)]
+        X[i] = np.concatenate([phi for phi, _ in fits])
+        energy[i] = np.concatenate([diag["residual_energy"] for _, diag in fits])
+        fit_mse[i] = np.mean([diag["fit_mse"] for _, diag in fits])
+        phi_norm[i] = float(np.sqrt(sum(diag["phi_norm"] ** 2 for _, diag in fits)))
     tmp = shard_path.with_name(f".{shard_path.stem}.{os.getpid()}.tmp.npz")
     np.savez(tmp, X=X, image_id=np.array([image_id for image_id, _ in rows]),
              residual_energy=energy, fit_mse=fit_mse, phi_norm=phi_norm)
@@ -158,51 +169,143 @@ def _describe_shard(args):
     return len(rows)
 
 
-def extract(manifest_path, fre_path, B, L, out_dir, workers=1, limit=None, shard_size=None):
+class _Run:
+    """One config's run: the pinned run.json, its shard layout, and the paths that go with it.
+
+    Shared by the all-in-one `extract` and by the runner-driven `--shard` / `--assemble` modes
+    (server-run branch, runner/selfdesc.py), so a description assembled from shards the runner
+    computed one subprocess at a time is the same file, byte for byte, as one computed here.
+    """
+
+    def __init__(self, manifest_path, fre_path, B, L, out_dir, limit=None, shard_size=None,
+                 workers=1, channels="luma"):
+        self.manifest_path, self.fre_path = Path(manifest_path), Path(fre_path)
+        self.B, self.L, self.channels = B, L, channels
+        self.manifest = pd.read_csv(self.manifest_path, low_memory=False)
+        if limit:
+            self.manifest = self.manifest.iloc[:limit]
+        filters, fre_sha = fre.load(self.fre_path)
+        self.K, self.M, _ = filters.shape
+        self.cid = config_id(self.fre_path, B, L, channels)
+        self.cfg_dir = Path(out_dir) / "descriptions" / self.cid
+        self.shard_dir = self.cfg_dir / "shards"
+        self.n = len(self.manifest)
+        if shard_size is None:
+            # Enough shards to keep every worker busy, few enough to stay cheap at 355k rows.
+            shard_size = int(min(1024, max(16, -(-self.n // (4 * max(workers, 1))))))
+        self.shard_size = shard_size
+        self.n_shards = -(-self.n // shard_size)
+        self.record = {"config": self.cid, "K": self.K, "M": self.M, "B": B, "L": L,
+                       "channels": channels,
+                       "fre_sha256": fre_sha, "manifest_sha256": file_sha256(self.manifest_path),
+                       "limit": limit, "rows": self.n, "shard_size": shard_size,
+                       "crop_policy": crop_policy(self.manifest)}
+
+    @property
+    def assembled(self):
+        # meta.json is written last, so its presence means every other output is complete.
+        return (self.cfg_dir / "meta.json").exists()
+
+    def pin(self):
+        """Write run.json, or refuse if shards on disk were made under a different run."""
+        run_path = self.cfg_dir / "run.json"
+        if run_path.exists():
+            previous = json.loads(run_path.read_text())
+            if previous != self.record:
+                diff = {k: (previous.get(k), self.record[k]) for k in self.record
+                        if previous.get(k) != self.record[k]}
+                raise SystemExit(f"{self.cid}: existing shards were made under a different run "
+                                 f"{diff}; delete {self.cfg_dir} to start over")
+        self.shard_dir.mkdir(parents=True, exist_ok=True)
+        # Atomic: under the runner, many shard subprocesses pin the same config at once, and a
+        # reader must never see a half-written file.
+        tmp = run_path.with_name(f".run.json.{os.getpid()}.tmp")
+        tmp.write_text(json.dumps(self.record, indent=2) + "\n")
+        os.replace(tmp, run_path)
+
+    def shard_path(self, s):
+        return self.shard_dir / f"{s:05d}.npz"
+
+    def task(self, s):
+        start = s * self.shard_size
+        part = self.manifest.iloc[start:start + self.shard_size]
+        rows = list(zip(part["image_id"], part["crop_path"]))
+        return (self.shard_path(s), rows, self.fre_path, self.B, self.L, self.channels)
+
+    def missing(self):
+        return [s for s in range(self.n_shards) if not self.shard_path(s).exists()]
+
+    def assemble(self, workers=None, seconds=None, execution="extract.py"):
+        """Concatenate the shards into descriptions.npz + diagnostics + meta.json; drop shards."""
+        missing = self.missing()
+        if missing:
+            raise SystemExit(f"{self.cid}: {len(missing)} shard(s) missing, cannot assemble "
+                             f"(first: {missing[:5]})")
+        shards = [np.load(self.shard_path(s)) for s in range(self.n_shards)]
+        X = np.concatenate([s["X"] for s in shards])
+        ids = np.concatenate([s["image_id"] for s in shards])
+        assert (ids == self.manifest["image_id"].to_numpy()).all(), \
+            "shard order drifted from the manifest"
+        assert np.isfinite(X).all(), f"{self.cid}: non-finite descriptions"
+
+        diag = pd.DataFrame({"image_id": ids,
+                             "fit_mse": np.concatenate([s["fit_mse"] for s in shards]),
+                             "phi_norm": np.concatenate([s["phi_norm"] for s in shards])})
+        energy = np.concatenate([s["residual_energy"] for s in shards])
+        planes = core.CHANNELS[self.channels]
+        for j in range(planes * self.K):
+            name = (f"residual_energy_{j}" if planes == 1
+                    else f"residual_energy_{'rgb'[j // self.K]}{j % self.K}")
+            diag[name] = energy[:, j]
+
+        np.savez(self.cfg_dir / "descriptions.npz", X=X, image_id=ids)
+        diag.to_parquet(self.cfg_dir / "diagnostics.parquet", index=False)
+        fre_meta_path = self.fre_path.with_suffix(".meta.json")
+        meta = dict(self.record,
+                    dim=int(X.shape[1]),
+                    fre_file=_display_path(self.fre_path),
+                    fre_meta=(json.loads(fre_meta_path.read_text())
+                              if fre_meta_path.exists() else None),
+                    manifest=_display_path(self.manifest_path),
+                    ridge=core.RIDGE,
+                    upstream_reference=("github.com/ductai199x/"
+                                        "Forensic-Self-Descriptions-CVPR25@50f2eae"),
+                    deviations=["no resize to 1024: input is the native-pixel crop (crop_policy)",
+                                "lambda calibrated to the released FRE's spectral diversity "
+                                "(fre.py)"]
+                    + (["R, G, B described separately with the luma-trained FRE, "
+                        "concatenated channel-major (core.load_channels)"]
+                       if self.channels != "luma" else []),
+                    git_commit=git_commit(),
+                    execution=execution,
+                    workers=workers,
+                    seconds_this_run=round(seconds, 1) if seconds is not None else None,
+                    numpy=np.__version__,
+                    written=datetime.now(timezone.utc).isoformat(timespec="seconds"))
+        (self.cfg_dir / "meta.json").write_text(json.dumps(meta, indent=2) + "\n")
+        for s in range(self.n_shards):
+            self.shard_path(s).unlink()
+        self.shard_dir.rmdir()
+        (self.cfg_dir / "run.json").unlink()
+        print(f"{self.cid}: wrote {X.shape} -> {self.cfg_dir}")
+        return self.cfg_dir
+
+
+def extract(manifest_path, fre_path, B, L, out_dir, workers=1, limit=None, shard_size=None,
+            channels="luma"):
     """Describe every manifest row under one config. Returns the config's output directory."""
-    manifest_path, fre_path, out_dir = Path(manifest_path), Path(fre_path), Path(out_dir)
-    manifest = pd.read_csv(manifest_path, low_memory=False)
-    if limit:
-        manifest = manifest.iloc[:limit]
-    filters, fre_sha = fre.load(fre_path)
-    K, M, _ = filters.shape
-    cid = config_id(fre_path, B, L)
-    cfg_dir = out_dir / "descriptions" / cid
-    shard_dir = cfg_dir / "shards"
+    run = _Run(manifest_path, fre_path, B, L, out_dir, limit, shard_size, workers, channels)
+    if run.assembled:
+        print(f"{run.cid}: already assembled, skipping")
+        return run.cfg_dir
+    run.pin()
 
-    # meta.json is written last, so its presence means every other output is complete.
-    if (cfg_dir / "meta.json").exists():
-        print(f"{cid}: already assembled, skipping")
-        return cfg_dir
-
-    n = len(manifest)
-    if shard_size is None:
-        # Enough shards to keep every worker busy, few enough to stay cheap at 355k rows.
-        shard_size = int(min(1024, max(16, -(-n // (4 * max(workers, 1))))))
-    run = {"config": cid, "K": K, "M": M, "B": B, "L": L, "fre_sha256": fre_sha,
-           "manifest_sha256": file_sha256(manifest_path), "limit": limit, "rows": n,
-           "shard_size": shard_size, "crop_policy": crop_policy(manifest)}
-    run_path = cfg_dir / "run.json"
-    if run_path.exists():
-        previous = json.loads(run_path.read_text())
-        if previous != run:
-            diff = {k: (previous.get(k), run[k]) for k in run if previous.get(k) != run[k]}
-            raise SystemExit(f"{cid}: existing shards were made under a different run {diff}; "
-                             f"delete {cfg_dir} to start over")
-    shard_dir.mkdir(parents=True, exist_ok=True)
-    run_path.write_text(json.dumps(run, indent=2) + "\n")
-
-    rows = list(zip(manifest["image_id"], manifest["crop_path"]))
-    todo = []
-    for s, start in enumerate(range(0, n, shard_size)):
-        path = shard_dir / f"{s:05d}.npz"
-        if not path.exists():
-            todo.append((path, rows[start:start + shard_size], fre_path, B, L))
-
+    todo = [run.task(s) for s in run.missing()]
     started = time.time()
-    done = n - sum(len(t[1]) for t in todo)
-    print(f"{cid}: {n} rows, D={core.description_dim(K, B)}, {len(todo)} shard(s) to do, "
-          f"{done} rows already done")
+    done = run.n - sum(len(t[1]) for t in todo)
+    dim = core.CHANNELS[channels] * core.description_dim(run.K, B)
+    print(f"{run.cid}: {run.n} rows, D={dim}, {len(todo)} shard(s) "
+          f"to do, {done} rows already done")
     if workers > 1 and len(todo) > 1:
         # One BLAS thread per process: the workers already fill the cores, and nested
         # threading on top of them only adds contention. Spawned children read these at import.
@@ -212,50 +315,12 @@ def extract(manifest_path, fre_path, B, L, out_dir, workers=1, limit=None, shard
         with ProcessPoolExecutor(max_workers=workers) as pool:
             for count in pool.map(_describe_shard, todo):
                 done += count
-                print(f"  {done}/{n}  ({time.time() - started:.0f}s)", flush=True)
+                print(f"  {done}/{run.n}  ({time.time() - started:.0f}s)", flush=True)
     else:
         for task in todo:
             done += _describe_shard(task)
-            print(f"  {done}/{n}  ({time.time() - started:.0f}s)", flush=True)
-    elapsed = time.time() - started
-
-    shards = [np.load(shard_dir / f"{s:05d}.npz") for s in range(-(-n // shard_size))]
-    X = np.concatenate([s["X"] for s in shards])
-    ids = np.concatenate([s["image_id"] for s in shards])
-    assert (ids == manifest["image_id"].to_numpy()).all(), "shard order drifted from the manifest"
-    assert np.isfinite(X).all(), f"{cid}: non-finite descriptions"
-
-    diag = pd.DataFrame({"image_id": ids,
-                         "fit_mse": np.concatenate([s["fit_mse"] for s in shards]),
-                         "phi_norm": np.concatenate([s["phi_norm"] for s in shards])})
-    energy = np.concatenate([s["residual_energy"] for s in shards])
-    for k in range(K):
-        diag[f"residual_energy_{k}"] = energy[:, k]
-
-    np.savez(cfg_dir / "descriptions.npz", X=X, image_id=ids)
-    diag.to_parquet(cfg_dir / "diagnostics.parquet", index=False)
-    fre_meta_path = fre_path.with_suffix(".meta.json")
-    meta = dict(run,
-                dim=int(X.shape[1]),
-                fre_file=_display_path(fre_path),
-                fre_meta=json.loads(fre_meta_path.read_text()) if fre_meta_path.exists() else None,
-                manifest=_display_path(manifest_path),
-                ridge=core.RIDGE,
-                upstream_reference="github.com/ductai199x/Forensic-Self-Descriptions-CVPR25@50f2eae",
-                deviations=["no resize to 1024: input is the native-pixel crop (crop_policy)",
-                            "lambda calibrated to the released FRE's spectral diversity (fre.py)"],
-                git_commit=git_commit(),
-                workers=workers,
-                seconds_this_run=round(elapsed, 1),
-                numpy=np.__version__,
-                written=datetime.now(timezone.utc).isoformat(timespec="seconds"))
-    (cfg_dir / "meta.json").write_text(json.dumps(meta, indent=2) + "\n")
-    for s in range(len(shards)):
-        (shard_dir / f"{s:05d}.npz").unlink()
-    shard_dir.rmdir()
-    run_path.unlink()
-    print(f"{cid}: wrote {X.shape} -> {cfg_dir}")
-    return cfg_dir
+            print(f"  {done}/{run.n}  ({time.time() - started:.0f}s)", flush=True)
+    return run.assemble(workers, time.time() - started)
 
 
 def write_image_index(manifest_path, out_dir, limit=None):
@@ -275,12 +340,44 @@ def main():
     parser.add_argument("--fre", type=Path, required=True, help="an FRE .npz (fre.py)")
     parser.add_argument("--B", type=int, default=11, help="self-description neighbourhood")
     parser.add_argument("--L", type=int, default=3, help="number of scales")
+    parser.add_argument("--channels", choices=sorted(core.CHANNELS), default="luma",
+                        help="describe the luma plane (upstream) or R, G, B separately")
     parser.add_argument("--out", type=Path, required=True)
     parser.add_argument("--workers", type=int, default=os.cpu_count())
     parser.add_argument("--limit", type=int, default=None, help="first N rows only (smoke test)")
+    parser.add_argument("--shard-size", type=int, default=None,
+                        help="rows per shard; must be the same on every --shard/--assemble call")
+    parser.add_argument("--shard", type=int, default=None, metavar="S",
+                        help="compute only shard S, single-process, then exit (runner mode)")
+    parser.add_argument("--assemble", action="store_true",
+                        help="assemble a config whose shards are all on disk, then exit "
+                             "(runner mode)")
     args = parser.parse_args()
+
+    if args.shard is not None or args.assemble:
+        run = _Run(args.manifest, args.fre, args.B, args.L, args.out, args.limit,
+                   args.shard_size, channels=args.channels)
+        if run.assembled:
+            print(f"{run.cid}: already assembled")
+            return
+        run.pin()
+        if args.shard is not None:
+            if not 0 <= args.shard < run.n_shards:
+                raise SystemExit(f"shard {args.shard} out of range 0..{run.n_shards - 1}")
+            if run.shard_path(args.shard).exists():
+                print(f"{run.cid}: shard {args.shard} already on disk")
+            else:
+                started = time.time()
+                count = _describe_shard(run.task(args.shard))
+                print(f"{run.cid}: shard {args.shard}: {count} rows in "
+                      f"{time.time() - started:.1f}s")
+        if args.assemble:
+            run.assemble(execution="runner (server-run branch): one subprocess per shard")
+        return
+
     write_image_index(args.manifest, args.out, args.limit)
-    extract(args.manifest, args.fre, args.B, args.L, args.out, args.workers, args.limit)
+    extract(args.manifest, args.fre, args.B, args.L, args.out, args.workers, args.limit,
+            channels=args.channels)
 
 
 if __name__ == "__main__":

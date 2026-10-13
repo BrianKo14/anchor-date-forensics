@@ -38,11 +38,116 @@ found* as the work progresses.
 - **Next:** what it implies.
 ```
 
-Numbering is continuous and never reused. Next free IDs: **D-010**, **R-003**.
+Numbering is continuous and never reused. Next free IDs: **D-012**, **R-003**.
 
 ---
 
 ## Decisions
+
+### D-011 · 2026-10-13 · Five diagnostics for the within-family time null, and what the server run covers
+- **Status:** Accepted. Logged before any server result. Amends D-010's config list (only K8 runs).
+- **Decision:** Alongside D-008/D-009's pre-registered confirmatory test, the server run tests five
+  explanations for R-002's null. Each one has a test, and its reading is fixed in advance. All of
+  them are exploratory (uncorrected, reported in full). Only D-008's four primary specs carry Holm.
+  1. **Lineage, not date** (`selfdesc/lineage.csv`). Each generator gets an output-stage label
+     (`stage`: GAN transposed-conv / upsample-conv / alias-free / no-upsampling; diffusion
+     pixel / latent / unknown) and a `codebase` label. Most are [R]. Latent Diffusion's KL-f8 is [S]
+     (CompVis `txt2img-1p4B-eval.yaml`: `AutoencoderKL`, `embed_dim: 4`). Midjourney and DALL-E 3
+     are `unknown` and excluded. **L1:** T1's machinery with lineage classes in place of time
+     bins (classes spanning ≥ 2 release groups). Null: labels permuted among generators,
+     conditional on every class still spanning 2 groups. **L2:** a rank regression of T2's
+     held-out pair divergence on [different lineage, |Δ date|], each term with its own
+     permutation null. *Supports lineage:* L1 `stage` p ≤ 0.05 and L2 b_lineage p ≤ 0.05 with
+     b_date p > 0.05. *Against:* L1 at its null.
+  2. **Power** (T5). The drift of release-group means over the date range, in within-generator
+     SDs (Mahalanobis), tested against a date-permutation null. It is bounded above by a group
+     bootstrap (95th percentile). It comes with a simulation, from the observed scatter, of how
+     many release groups a drift of 0.5/1/2 SD needs. *A bound < 1 SD* means moderate drift is
+     ruled out. *A bound ≥ 1 SD* means the question is power-limited. AI-GenBench cannot add
+     groups (36 generators). Only new generators can (the post-2024 fill).
+  3. **Input pipeline** (arms): 200 fakes per generator (7,200 rows, seeded), K8, in a 2 × 2 design.
+     The two factors are **q95 crops** (the panel's) vs **native crops**, and **luma** vs
+     **RGB**. Native crops have the same box and alignment, cut from the published AI-GenBench
+     parquet source bytes with `prepare_image`'s decode and alpha composite but no JPEG re-encode
+     (`imports/native_crop_cache.py`; QC = PSNR vs the q95 crop, refused below 30 dB). RGB means
+     Φ for R, G and B separately with the frozen luma FRE, concatenated: a departure from the
+     paper, which uses luma only. Every ArtiFact image (GAN-heavy) already arrives as a 200-px
+     JPEG, so no pipeline of ours can restore it. Every arm is therefore also read without
+     ArtiFact. Readout per arm: S1 (family 5-NN among fakes; generator 5-NN inside family ×
+     origin cells), T1 primary, T5. *Pipeline was hiding signal:* native arms raise S1 and T1/T5.
+     *Pipeline not the reason:* S1 rises, T1/T5 do not. *No effect:* neither rises.
+  4. **Centring.** Single-origin T1 specs, where no centring choice can matter. These are
+     GAN∩ArtiFact (already in the D-008 grid), GAN∩Forensynths and diffusion∩GenImage at 3 bins,
+     and diffusion∩ArtiFact at 2 bins (4 groups). Origin is matched on the source name, ignoring
+     split suffixes. They are read together with the family-only centring spec. *Origin:* a
+     family-only signal that is absent within single origins.
+     **Found while preparing (local sample, K8, T5, 500 date permutations):** under family ×
+     origin centring the observed diffusion drift sits *below* its null (Φ 0.46 SD vs null mean
+     1.03, p 0.99; φ̄ 0.29 vs 0.96, p 1.00). Under family-only centring it is above (Φ 2.97 vs
+     1.70, p 0.012; φ̄ 2.80 vs 1.57, p 0.008). GAN is null both ways. [I] Origin datasets are
+     tied to release dates (ArtiFact early, SFHQ-T2I = FLUX only), so centring on them
+     removes date-aligned variation. The date-permutation null is then not exchangeable and is
+     conservative. This plausibly applies to D-008's primary T1 too, which uses the same
+     centring, so its confirmatory p-values lean toward the null. Family-only centring has the
+     opposite problem: origin can pass as time. Only single-origin tests escape both, so T5 also
+     runs under family-only centring and within every single origin and size band. The
+     confirmatory spec is left as registered; this caveat goes with its result.
+  5. **Resolution** (diffusion). T1 at 2 and 3 bins, T5, and a size-only T1 inside native
+     short-side bands ≤ 256 px (DDPM, ADM, Palette, VQ-Diff, DDGAN/Glide/LDM, IF: 6 groups) and
+     ≥ 512 px (MJ, SD1.4/1.5/2.1, SDXL, DALL-E 3, FLUX, part of IF). *Not just resolution:* the
+     φ̄ signal survives in a band where size-only T1 is near its null. The family-only diffusion
+     drift above is the one to check this way: FLUX, DALL-E 3 and SDXL are both the latest and
+     the largest outputs.
+- **Scale ("large enough"):** the unit is the release group, so per-generator n beyond a few
+  hundred adds little. The 36k draw (500 per generator) for the confirmatory run and diagnostics
+  1, 2, 4 and 5; 200 per generator for the arms. **Only K8 is extracted.** The rest of D-006's
+  config grid is a robustness check that none of the five questions needs, so it is deferred
+  (user, 2026-10-13). It would have been the longest run (~3–4 h without K16; K16 alone was
+  measured on the server at 9.3 s/image/core vs 2.8 for K8, one core, nice 10).
+- **Order** (`experiments/selfdesc-d011.queue`, `./runner/run.sh selfdesc queue`): 36k K8 +
+  full suite; q95 arms; native arms. Estimates [I] from the measured 2.8 s/image/core and about
+  24 physical cores (48 threads):
+  - 36k K8 about 1–1.5 h (D-010 said ~40 min: it counted 40 threads as cores), full temporal
+    suite 1–1.5 h;
+  - the arms about 1.5 h with their suites.
+  - Total about 4–5 h. Native crops are built beforehand: a one-off read of the 72 shards (~35 GB).
+- **Why:** user request (2026-10-13) to test the five explanations for the null in R-002, plus
+  the pending confirmatory run, at a size that answers them rather than the full 355k.
+- **Consequences:**
+  - `extract.py`/`sweep.py` gain `--channels`.
+  - `temporal.py` gains `--suite {full, arms, quick}`, subsets (`origin=`, `origin!=`, `short<=`,
+    `short>=`), L1, L2, T5, S1, and per-config output dirs (`temporal_<config>`).
+  - An untestable subset returns NaN with a reason instead of crashing.
+  - The runner gains `--channels/--temporal-configs/--suite` and a queue (server-run
+    `runner/selfdesc_queue.py`).
+  - R-002's local numbers stay valid; its code paths for the D-008 statistics are unchanged.
+    Lineage labels must not be edited after results are seen without a new entry (the cache
+    key includes the CSV hash).
+- **Refs:** `selfdesc/lineage.csv`, `selfdesc/temporal.py`, `imports/native_crop_cache.py`,
+  `experiments/selfdesc-d011.queue`; server-run `runner/selfdesc.py`, `runner/selfdesc_queue.py`.
+
+### D-010 · 2026-10-11 · Server run of self-descriptions + temporal tests through the runner
+- **Status:** Accepted; config list amended by D-011 (K8 only; rest of the grid deferred)
+- **Decision:** Run the self-description extraction (all 10 configs) and the temporal tests on
+  **stratified-36k** (500 images/generator), on the lab server, through the `server-run` branch's
+  runner. It is a new CPU job (`runner/selfdesc.py`, `./runner/run.sh selfdesc ...`) beside the
+  GPU panel job. Settings:
+  - at most **40 of 48 cores**, never the last 4, lowered live as other users' load rises
+    (agreed with Brian); every subprocess runs under `nice 10`;
+  - the FREs frozen on the local sample are reused, and `--frozen` makes training a new one an
+    error, so the server and local runs differ only in their images;
+  - `K8_M11_B11_L3` is extracted first, since the confirmatory test (D-008/D-009) needs only it;
+  - temporal: the pre-registered primary spec first, 1000 release-group permutations, every block
+    cached for resumability.
+- **Why:** user request (2026-10-11). The full 355k would take ~40 h of extraction for all
+  configs and more than the confirmatory test needs.
+- **Consequences:** main gains `extract.py --shard/--assemble/--shard-size`, `sweep.py
+  --frozen/--plan-json` and the temporal cache. Output lands in
+  `experiments/selfdesc-36k/` on the server's main checkout. Estimate [I]: ~2–3 s/image/core for
+  K8 on the 2014 Xeons, so ~40 min for K8 and ~5 h for all configs, then ~2–3 h of temporal.
+  Untested on the server until the smoke run.
+- **Refs:** server-run `runner/selfdesc.py`, `runner/run.sh`; main `selfdesc/extract.py`,
+  `selfdesc/sweep.py`, `selfdesc/temporal.py`.
 
 ### D-009 · 2026-10-11 · Release groups, not generators, are the unit in the time tests
 - **Status:** Accepted. Supersedes D-008's holdout and permutation unit; the rest of D-008 stands.
