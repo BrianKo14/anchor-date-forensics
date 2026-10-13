@@ -111,6 +111,16 @@ Numbering is continuous and never reused. Next free IDs: **D-012**, **R-003**.
     suite 1–1.5 h;
   - the arms about 1.5 h with their suites.
   - Total about 4–5 h. Native crops are built beforehand: a one-off read of the 72 shards (~35 GB).
+  - **Corrected 2026-10-13, after the server smoke run:** K8 throughput *falls* with more
+    concurrent processes (one-core 0.45 img/s; 12 processes 3.05; 24 2.10; 36 1.68). Each fit
+    streams hundreds of MB of temporaries, so the processes contend for cache and memory, not
+    cores. Extraction therefore runs on 12 workers (server-run `SELFDESC_WORKERS`), and the
+    temporal stage, whose GMM fits are cache-sized, runs on 24. At ~3 img/s:
+    - 36k K8 about 3.3 h;
+    - each arm about 2.7 h (RGB = 3× luma);
+    - temporal about 1.5–2 h in total.
+    The total is **~10–11 h**, not 4–5. The native crops took one pass (7,200 rows, PSNR vs q95
+    ≥ 40 dB, median 47–54).
 - **Why:** user request (2026-10-13) to test the five explanations for the null in R-002, plus
   the pending confirmatory run, at a size that answers them rather than the full 355k.
 - **Consequences:**
