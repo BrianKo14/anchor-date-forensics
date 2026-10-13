@@ -140,10 +140,48 @@ PORT = int(os.environ.get("PANEL_PORT", 8766))   # 8765 is the downloader's
 POLL_SECONDS = 2
 
 
+# --- self-descriptions: a CPU job (runner/selfdesc.py) -----------------------------------------
+#
+# Forensic self-descriptions (main's selfdesc/, DECISIONS.md D-006) are a per-image fp64
+# least-squares fit: CPU work, no GPU. The same rules as the panel apply -- yield, resume, leave
+# the shared volumes alone -- but the governed resource is cores, not cards.
+
+# main's own interpreter: selfdesc needs only numpy/scipy/sklearn/pandas, all in main's .venv.
+MAIN_PYTHON = PANEL_REPO / ".venv" / "bin" / "python"
+
+# Upper bound on concurrent single-threaded extraction subprocesses (and temporal's joblib
+# workers). 40 of 48 by agreement with Brian (2026-10-11); the governor lowers it live whenever
+# other users' load rises, and HEADROOM cores are never taken.
+SELFDESC_WORKERS = int(os.environ.get("SELFDESC_WORKERS", 40))
+SELFDESC_HEADROOM = 4
+NICE = 10   # every subprocess runs under nice: a colleague's interactive work wins every tie
+
+# Rows per shard. One shard is one subprocess, so this trades process start-up (~1 s) against
+# how much a stop or a crash can lose: at ~2 s/image/core for K8, 256 rows is ~8 min.
+SELFDESC_SHARD = 256
+
+# The FREs frozen on the local sample (tracked in main). The server reuses them, never trains:
+# sweep.py --frozen refuses, so the two runs differ only in the images they describe.
+SELFDESC_FRE_DIR = PANEL_REPO / "experiments" / "selfdesc-sample" / "fre"
+
+# Extracted first: the pre-registered confirmatory temporal test (D-008/D-009) needs only this
+# config, so a run that dies early still leaves the one that matters.
+SELFDESC_FIRST = "K8_M11_B11_L3"
+
+# selfdesc reads source_format etc. through imports/sample/common.py, whose DATA_DIR comes from
+# this variable. ~/.bashrc exports it only for interactive shells, so set it explicitly.
+DATA_ROOT = os.environ.get("AIGENBENCH_DATA_ROOT", "/data/aigenbench")
+
+TEMPORAL_PERMS = 1000
+SHARD_TIMEOUT = 2 * 60 * 60          # a 256-row shard taking 2 h is wedged
+TEMPORAL_TIMEOUT = 24 * 60 * 60
+SELFDESC_PORT = int(os.environ.get("SELFDESC_PORT", 8767))   # 8766 is the panel's
+
+
 _WORK_ROOT = WORK_DIR
 
 
-def scope_to_manifest(manifest_sha):
+def scope_to_manifest(manifest_sha, prefix="scoring"):
     """Give each manifest its own work directory and job database.
 
     Chunks are keyed by (detector, seq), and seq only means anything relative to one manifest:
@@ -158,7 +196,7 @@ def scope_to_manifest(manifest_sha):
     global WORK_DIR, STATE_DB
     tag = manifest_sha[:12]
     WORK_DIR = _WORK_ROOT / tag
-    STATE_DB = VAR_DIR / f"scoring-{tag}.sqlite"
+    STATE_DB = VAR_DIR / f"{prefix}-{tag}.sqlite"
     return tag
 
 

@@ -16,23 +16,26 @@ import time
 import config
 
 
-def eta_seconds(state, detector, remaining_images):
+def eta_seconds(state, detector, remaining_images, workers=None):
     per_image = state.per_image_seconds(detector)
     if not per_image or remaining_images <= 0:
         return None
-    # Divided across however many GPUs are actually working, since per_image is measured per
+    # Divided across however many workers are actually running, since per_image is measured per
     # worker; with both cards free the queue drains at roughly twice one worker's rate.
-    workers = max(1, len(config.GPUS))
+    workers = max(1, workers if workers is not None else len(config.GPUS))
     return round(remaining_images * per_image / workers)
 
 
-def snapshot(state, gov, stop, started):
+def snapshot(state, gov, stop, started, order=None, workers=None, extra=None):
+    """`order`, `workers` and `extra` let a job other than the panel (runner/selfdesc.py) reuse
+    the same page: its own work units, its own worker count, and job-specific fields."""
     counts = state.counts()
     control = state.all_control()
     rates = state.recent_rate()
+    live_workers = workers() if callable(workers) else workers
 
     detectors = []
-    for name in config.PANEL_ORDER:
+    for name in order or config.PANEL_ORDER:
         entry = counts.get(name)
         if not entry:
             continue
@@ -47,14 +50,14 @@ def snapshot(state, gov, stop, started):
             "chunks": {k: entry.get(k, 0) for k in ("pending", "active", "done", "failed")},
             "ms_per_image": round(per_image * 1000) if per_image else None,
             "images_per_s": round(rates.get(name, 0.0), 1),
-            "eta_seconds": eta_seconds(state, name, total - done),
+            "eta_seconds": eta_seconds(state, name, total - done, live_workers),
             "paused": state.is_paused(name),
         })
 
     usage = shutil.disk_usage(config.WORK_DIR)
     images_done = sum(d["images_done"] for d in detectors)
     images_total = sum(d["images_total"] for d in detectors)
-    return {
+    snap = {
         "elapsed": round(time.time() - started),
         "stopping": stop.is_set(),
         "paused": control.get("paused") == "1",
@@ -73,13 +76,17 @@ def snapshot(state, gov, stop, started):
         "failures": state.failures(),
         "events": state.recent_events(30),
     }
+    if extra is not None:
+        snap.update(extra())
+    return snap
 
 
-def build_app(state, gov, stop, started):
+def build_app(state, gov, stop, started, order=None, workers=None, extra=None,
+              title="panel scoring"):
     from fastapi import FastAPI
     from fastapi.responses import FileResponse, JSONResponse
 
-    app = FastAPI(title="panel scoring", docs_url=None, redoc_url=None)
+    app = FastAPI(title=title, docs_url=None, redoc_url=None)
     index = config.PROJECT_ROOT / "runner" / "static" / "index.html"
 
     @app.get("/")
@@ -88,11 +95,11 @@ def build_app(state, gov, stop, started):
 
     @app.get("/api/status")
     def status():
-        return JSONResponse(snapshot(state, gov, stop, started))
+        return JSONResponse(snapshot(state, gov, stop, started, order, workers, extra))
 
     @app.post("/api/control")
     async def control(payload: dict):
-        allowed = {"paused"} | {f"paused:{name}" for name in config.PANEL_ORDER}
+        allowed = {"paused"} | {f"paused:{name}" for name in (order or config.PANEL_ORDER)}
         applied = {}
         for key, value in payload.items():
             if key not in allowed:

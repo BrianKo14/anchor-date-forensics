@@ -38,7 +38,7 @@
 </style>
 
 <div class="wrap">
-  <h1>Detector panel &mdash; scoring</h1>
+  <h1 id="title">Detector panel &mdash; scoring</h1>
   <div class="sub" id="sub">connecting&hellip;</div>
   <div id="banners"></div>
 
@@ -98,23 +98,24 @@ async function togglePause() {
 
 function render(s) {
   paused = s.paused;
+  if (s.title) { document.title = s.title; $('title').textContent = s.title; }
   $('sub').textContent =
-    `${s.overall.images_done.toLocaleString()} of ${s.overall.images_total.toLocaleString()} scores`
-    + ` · running ${dur(s.elapsed)}`;
+    `${s.overall.images_done.toLocaleString()} of ${s.overall.images_total.toLocaleString()} `
+    + `${s.unit_noun || 'scores'} · running ${dur(s.elapsed)}` + (s.stage ? ` · stage: ${s.stage}` : '');
 
   const banners = [];
   if (s.stopping) banners.push('stopping — finishing the chunks in flight');
   if (s.paused) banners.push('paused from the dashboard');
   if (s.courtesy_paused) banners.push(`held by the courtesy PAUSE file at ${s.pause_file}`);
   for (const [gpu, reason] of Object.entries(s.governor.blocked || {}))
-    banners.push(`gpu ${gpu} standing down — ${reason}`);
+    banners.push(`${s.governor.unit || 'gpu'} ${gpu} standing down — ${reason}`);
   $('banners').innerHTML = banners.map(b => `<div class="banner">${b}</div>`).join('');
 
   $('o-txt').textContent = s.overall.pct + '%';
   $('o-bar').style.width = s.overall.pct + '%';
   $('o-bar').className = 'fill' + (s.overall.pct >= 100 ? ' done' : '');
-  $('o-rate').textContent = `${s.overall.images_per_s} img/s across ${
-    Object.keys(s.governor.memory || {}).length || 1} gpu`;
+  $('o-rate').textContent = s.workers_label ? `${s.overall.images_per_s} img/s · ${s.workers_label}`
+    : `${s.overall.images_per_s} img/s across ${Object.keys(s.governor.memory || {}).length || 1} gpu`;
   $('pause').textContent = s.paused ? 'resume' : 'pause';
 
   $('detectors').innerHTML = s.detectors.map(d => `
